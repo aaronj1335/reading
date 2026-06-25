@@ -158,6 +158,146 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
 .meta-value { text-transform: capitalize; }
 .book-body { margin-top: 1.4rem; }
 
+/* ---- Site header nav (Stats link / All books link) ---- */
+.site-header-row { display: flex; align-items: baseline; gap: 1rem; }
+.site-nav-link { font-size: 0.9rem; color: var(--accent); text-decoration: none; }
+.site-nav-link:hover { text-decoration: underline; }
+
+/* ---- Stats page ---- */
+.stats-page { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 2rem; }
+
+.stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  flex: 1 1 6.5rem;
+  min-width: 0;
+}
+
+.stat-num {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.stat-lbl {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+}
+
+.stats-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.stats-section-heading {
+  margin: 0 0 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+}
+
+.stats-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 0.75rem;
+}
+
+.stats-section-header .stats-section-heading { margin: 0; }
+
+.stats-section-header select {
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.35rem 0.65rem;
+}
+
+.stats-section-header select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.chart-container { overflow-x: auto; }
+
+/* SVG chart primitives (filled by JS) */
+.year-chart-svg { display: block; }
+.chart-grid { stroke: var(--border); stroke-width: 1; }
+.chart-label { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.chart-area { fill: url(#area-gradient); }
+.area-stop-top { stop-color: var(--accent); stop-opacity: 0.2; }
+.area-stop-bottom { stop-color: var(--accent); stop-opacity: 0; }
+.chart-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.chart-dot {
+  fill: var(--accent);
+  cursor: pointer;
+  transition: r 0.1s;
+}
+.chart-dot:hover, .chart-dot:focus { r: 7; outline: none; }
+
+/* Category / pages bar chart */
+.cat-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.65rem;
+  font-size: 0.9rem;
+}
+.cat-bar-label { width: 6.5rem; flex-shrink: 0; color: var(--text); }
+.cat-bar-track {
+  flex: 1;
+  height: 14px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.cat-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+.cat-bar-fill.fiction    { background: var(--fiction); }
+.cat-bar-fill.nonfiction { background: var(--nonfiction); }
+.cat-bar-count { width: 2.5rem; text-align: right; color: var(--muted); font-size: 0.85rem; }
+
+.pages-breakdown { margin-top: 1.25rem; }
+.stats-subsection-heading {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin: 0 0 0.75rem;
+}
+.cat-total { margin: 0.4rem 0 0; font-size: 0.85rem; color: var(--muted); }
+
+.stats-book-list { margin-top: 0; }
+
 /* ---- Wider screens: controls move to the top ---- */
 @media (min-width: 700px) {
   body { padding-bottom: 2rem; }
