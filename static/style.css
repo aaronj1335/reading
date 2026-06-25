@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light dark;
   --bg: #fbfaf7;
   --surface: #ffffff;
   --text: #1d1c1a;
@@ -9,6 +10,20 @@
   --nonfiction: #6a7a3a;
   --radius: 10px;
   --maxw: 720px;
+}
+
+/* Dark mode follows the OS setting (no manual toggle). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #161513;
+    --surface: #211f1c;
+    --text: #ece8e1;
+    --muted: #a39d94;
+    --border: #353230;
+    --accent: #c79e74;
+    --fiction: #6da3c9;
+    --nonfiction: #9fb066;
+  }
 }
 
 * { box-sizing: border-box; }
