@@ -10,6 +10,7 @@ const countEl = document.getElementById("count");
 const searchEl = document.getElementById("search");
 const categoryEl = document.getElementById("category");
 const tagEl = document.getElementById("tag");
+const excludeTagEl = document.getElementById("exclude-tag");
 const sortEl = document.getElementById("sort");
 
 function formatDate(iso) {
@@ -47,11 +48,13 @@ function render() {
   const q = searchEl.value.trim().toLowerCase();
   const cat = categoryEl.value;
   const tag = tagEl.value;
+  const excludeTag = excludeTagEl.value;
   const sort = sortEl.value;
 
   let books = BOOKS.filter((b) => {
     if (cat && b.category !== cat) return false;
     if (tag && !b.tags.includes(tag)) return false;
+    if (excludeTag && b.tags.includes(excludeTag)) return false;
     if (q) {
       const hay = (b.title + " " + b.author + " " + b.tags.join(" ")).toLowerCase();
       if (!hay.includes(q)) return false;
@@ -104,7 +107,7 @@ function escapeHtml(s) {
   ));
 }
 
-[searchEl, categoryEl, tagEl, sortEl].forEach((el) =>
+[searchEl, categoryEl, tagEl, excludeTagEl, sortEl].forEach((el) =>
   el.addEventListener("input", render)
 );
 
