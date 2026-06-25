@@ -37,6 +37,7 @@ title: The Brothers Karamazov
 author: Fyodor Dostoevsky
 finished: 2025-12-29      # ISO date, or leave blank: `finished:`
 started: 2022-04-12       # ISO date
+stars: 5                  # 1–5 Goodreads rating, or leave blank: `stars:`
 category: fiction         # fiction | nonfiction
 tags: [read-with-kids]    # [] if none
 isbn: "9780374528379"     # optional; loads a real cover from Open Library
@@ -51,6 +52,8 @@ Notes on the fields:
   when the value would otherwise confuse YAML — most commonly a title containing
   `: ` (e.g. `"Guns, Germs, and Steel: The Fates of Human Societies"`) or a purely
   numeric title (e.g. `"1984"`).
+- **`stars`** is a 1–5 rating carried over from the Goodreads export. Leave it
+  blank (`stars:`) for unrated books; the rating then won't render.
 - **`category`** is either `fiction` or `nonfiction`.
 - **`tags`** is a YAML list. The current tags are just `read-with-kids`.
 - **`isbn`** (optional) loads a real cover from Open Library. Quote it (`"..."`) so

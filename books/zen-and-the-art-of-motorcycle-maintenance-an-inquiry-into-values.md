@@ -4,6 +4,7 @@ author: Robert M. Pirsig
 isbn: "9780060589462"
 finished:
 started: 2018-07-27
+stars:
 category: nonfiction
 tags: []
 ---

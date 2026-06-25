@@ -48,6 +48,14 @@ def parse_book(path):
         # PyYAML may parse a date into a date object; normalise to ISO string.
         return value.isoformat() if hasattr(value, "isoformat") else (value or "")
 
+    def as_stars(value):
+        # 1–5 Goodreads rating; 0 / blank / unparseable means "unrated".
+        try:
+            n = int(value)
+        except (TypeError, ValueError):
+            return 0
+        return n if 0 <= n <= 5 else 0
+
     title = str(meta.get("title", "")).strip()
     finished = as_date(meta.get("finished"))
     started = as_date(meta.get("started"))
@@ -66,6 +74,7 @@ def parse_book(path):
         "finished": finished,
         "started": started,
         "cover": cover,
+        "stars": as_stars(meta.get("stars")),
         # sort key: finished if present, else started (the requested fallback)
         "sort_date": finished or started,
         "category": str(meta.get("category", "")).strip(),
@@ -92,7 +101,7 @@ def page(title, head_extra, body, depth):
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
 <title>{e(title)}</title>
 <link rel="stylesheet" href="{NORMALIZE_CDN}">
 <link rel="stylesheet" href="{prefix}style.css">
@@ -105,8 +114,14 @@ def page(title, head_extra, body, depth):
 """
 
 
+def stars_display(n):
+    """Render a 1–5 rating as filled/empty stars; empty string when unrated."""
+    return "★" * n + "☆" * (5 - n) if n else ""
+
+
 def render_index(books):
-    fields = ("slug", "title", "author", "finished", "started", "sort_date", "category", "tags", "cover")
+    fields = ("slug", "title", "author", "finished", "started", "sort_date",
+              "category", "tags", "stars", "cover")
     data = json.dumps([{k: b[k] for k in fields} for b in books], ensure_ascii=False)
     # All distinct tags, for the tag filter.
     tags = sorted({t for b in books for t in b["tags"]})
@@ -129,6 +144,7 @@ def render_index(books):
       <option value="started">Recently started</option>
       <option value="title">Title</option>
       <option value="author">Author</option>
+      <option value="stars">Rating</option>
     </select>
   </div>
 </div>"""
@@ -149,6 +165,8 @@ def render_index(books):
 
 def render_book(book):
     meta_rows = []
+    if book["stars"]:
+        meta_rows.append(("Rating", stars_display(book["stars"])))
     if book["finished"]:
         meta_rows.append(("Finished", book["finished"]))
     if book["started"]:
