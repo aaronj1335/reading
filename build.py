@@ -127,6 +127,10 @@ def render_index(books):
       <option value="">All tags</option>
       {tag_options}
     </select>
+    <select id="exclude-tag" aria-label="Exclude tag">
+      <option value="">Exclude none</option>
+      {tag_options}
+    </select>
     <select id="sort" aria-label="Sort by">
       <option value="finished">Recently finished</option>
       <option value="started">Recently started</option>
