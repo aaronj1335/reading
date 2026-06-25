@@ -67,9 +67,14 @@ function card(b) {
   const date = dateLabel ? `<span class="card-date">${datePrefix}${formatDate(dateLabel)}</span>` : "";
   const tags = b.tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("");
   const slug = encodeURIComponent(b.slug);
+  const fallback = `covers/${slug}.svg`;
+  const coverSrc = b.cover || fallback;
+  const onerror = b.cover
+    ? ` onerror="this.onerror=null;this.src='${fallback}'"`
+    : "";
   return `<li class="card">
     <a class="card-link" href="books/${slug}.html">
-      <img class="card-cover" src="covers/${slug}.svg" alt="" width="300" height="450" loading="lazy">
+      <img class="card-cover" src="${escapeHtml(coverSrc)}"${onerror} alt="" width="300" height="450" loading="lazy">
       <span class="card-text">
         <span class="card-title">${escapeHtml(b.title)}</span>
         <span class="card-author">${escapeHtml(b.author)}</span>

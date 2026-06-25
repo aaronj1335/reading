@@ -51,12 +51,21 @@ def parse_book(path):
     title = str(meta.get("title", "")).strip()
     finished = as_date(meta.get("finished"))
     started = as_date(meta.get("started"))
+    # Real cover art: an explicit `cover:` URL wins; otherwise derive one from
+    # `isbn:` via Open Library's by-ISBN cover endpoint. `default=false` makes it
+    # 404 (rather than serve a blank placeholder) when no cover exists, so the
+    # client can fall back to the generated SVG cover.
+    isbn = re.sub(r"[^0-9Xx]", "", str(meta.get("isbn", "")))
+    cover = str(meta.get("cover", "")).strip()
+    if not cover and isbn:
+        cover = f"https://covers.openlibrary.org/b/isbn/{isbn}-L.jpg?default=false"
     return {
         "slug": path.stem,
         "title": title,
         "author": str(meta.get("author", "")).strip(),
         "finished": finished,
         "started": started,
+        "cover": cover,
         # sort key: finished if present, else started (the requested fallback)
         "sort_date": finished or started,
         "category": str(meta.get("category", "")).strip(),
@@ -97,7 +106,7 @@ def page(title, head_extra, body, depth):
 
 
 def render_index(books):
-    fields = ("slug", "title", "author", "finished", "started", "sort_date", "category", "tags")
+    fields = ("slug", "title", "author", "finished", "started", "sort_date", "category", "tags", "cover")
     data = json.dumps([{k: b[k] for k in fields} for b in books], ensure_ascii=False)
     # All distinct tags, for the tag filter.
     tags = sorted({t for b in books for t in b["tags"]})
@@ -154,10 +163,15 @@ def render_book(book):
         for k, v in meta_rows
     )
     body_html = f'<div class="book-body">{book["body_html"]}</div>' if book["body_html"] else ""
+    fallback = f"../covers/{e(book['slug'])}.svg"
+    cover_src = e(book["cover"]) if book["cover"] else fallback
+    onerror = (
+        f" onerror=\"this.onerror=null;this.src='{fallback}'\"" if book["cover"] else ""
+    )
     body = f"""<article class="book-page">
   <p><a class="back" href="../index.html">← All books</a></p>
   <div class="book-header">
-    <img class="book-cover" src="../covers/{e(book["slug"])}.svg" alt="" width="300" height="450">
+    <img class="book-cover" src="{cover_src}"{onerror} alt="" width="300" height="450">
     <div class="book-header-text">
       <h1>{e(book["title"])}</h1>
       <p class="author">{e(book["author"])}</p>
