@@ -6,8 +6,10 @@ frontmatter (title, author, finished, started, category, tags). This script
 parses them and renders:
 
   _site/index.html        searchable / filterable / sortable list
+  _site/stats.html        reading statistics page
   _site/books/<slug>.html one page per book
   _site/index.js          copied from static/
+  _site/stats.js          copied from static/
   _site/style.css         copied from static/
   _site/.nojekyll         so GitHub Pages serves files verbatim
 
@@ -22,6 +24,7 @@ import json
 import re
 import shutil
 import textwrap
+from collections import defaultdict
 from datetime import date as _date
 from pathlib import Path
 
@@ -70,6 +73,11 @@ def parse_book(path):
     cover = str(meta.get("cover", "")).strip()
     if not cover and isbn:
         cover = f"https://covers.openlibrary.org/b/isbn/{isbn}-L.jpg?default=false"
+    try:
+        pages = int(meta.get("pages") or 0) or None
+    except (TypeError, ValueError):
+        pages = None
+
     return {
         "slug": path.stem,
         "title": title,
@@ -82,6 +90,7 @@ def parse_book(path):
         "sort_date": finished or started,
         "category": str(meta.get("category", "")).strip(),
         "tags": [str(t).strip() for t in (meta.get("tags") or [])],
+        "pages": pages,
         "body_html": markdown.markdown(body_md) if body_md else "",
     }
 
@@ -157,7 +166,10 @@ def render_index(books):
 </div>"""
 
     body = f"""<header class="site-header">
-  <h1>Reading</h1>
+  <div class="site-header-row">
+    <h1>Reading</h1>
+    <a class="site-nav-link" href="stats.html">Stats</a>
+  </div>
   <p class="count"><span id="count">{len(books)}</span> books</p>
   <nav class="exports">
     <a href="books.csv" download>CSV</a>
@@ -172,6 +184,115 @@ def render_index(books):
 <script id="books-data" type="application/json">{data}</script>
 <script src="index.js"></script>"""
     return page("Reading", "", body, depth=0)
+
+
+def render_stats(books):
+    finished = [b for b in books if b["finished"]]
+
+    by_year = defaultdict(list)
+    for b in finished:
+        year = int(b["finished"][:4])
+        by_year[year].append(b)
+
+    years = sorted(by_year.keys())
+
+    by_year_data = [
+        {
+            "year": yr,
+            "count": len(by_year[yr]),
+            "fiction": sum(1 for b in by_year[yr] if b["category"] == "fiction"),
+            "nonfiction": sum(1 for b in by_year[yr] if b["category"] == "nonfiction"),
+        }
+        for yr in years
+    ]
+
+    book_fields = ("slug", "title", "author", "finished", "stars", "category", "tags", "cover", "pages")
+    books_by_year = {
+        str(yr): [
+            {k: b[k] for k in book_fields}
+            for b in sorted(by_year[yr], key=lambda b: b["finished"], reverse=True)
+        ]
+        for yr in years
+    }
+
+    fiction_count = sum(1 for b in books if b["category"] == "fiction")
+    nonfiction_count = sum(1 for b in books if b["category"] == "nonfiction")
+
+    pages_total = sum(b["pages"] for b in books if b["pages"])
+    pages_fiction = sum(b["pages"] for b in books if b["pages"] and b["category"] == "fiction")
+    pages_nonfiction = sum(b["pages"] for b in books if b["pages"] and b["category"] == "nonfiction")
+
+    avg_per_year = round(len(finished) / len(years), 1) if years else 0
+    default_year = str(years[-1]) if years else ""
+
+    stats_data = {
+        "total": len(books),
+        "finished": len(finished),
+        "avg_per_year": avg_per_year,
+        "by_year": by_year_data,
+        "by_category": {"fiction": fiction_count, "nonfiction": nonfiction_count},
+        "pages": {"total": pages_total, "fiction": pages_fiction, "nonfiction": pages_nonfiction},
+        "books_by_year": books_by_year,
+    }
+    data = json.dumps(stats_data, ensure_ascii=False)
+
+    year_options = "".join(
+        f'<option value="{yr}"{" selected" if str(yr) == default_year else ""}>{yr}</option>'
+        for yr in reversed(years)
+    )
+    year_range = f"{years[0]}–{years[-1]}" if len(years) > 1 else (str(years[0]) if years else "")
+
+    body = f"""<header class="site-header">
+  <div class="site-header-row">
+    <h1>Reading Stats</h1>
+    <a class="site-nav-link" href="index.html">All books</a>
+  </div>
+  <p class="count">{e(year_range)}</p>
+</header>
+<main class="stats-page">
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">{len(finished)}</div>
+      <div class="stat-lbl">Books finished</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{len(books)}</div>
+      <div class="stat-lbl">Total tracked</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{len(years)}</div>
+      <div class="stat-lbl">Years tracked</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{avg_per_year}</div>
+      <div class="stat-lbl">Avg&nbsp;finished / year</div>
+    </div>
+  </div>
+
+  <div class="stats-section">
+    <h2 class="stats-section-heading">Books finished per year</h2>
+    <div id="year-chart-container" class="chart-container"></div>
+  </div>
+
+  <div class="stats-section">
+    <div class="stats-section-header">
+      <h2 class="stats-section-heading" id="year-section-heading">{e(default_year)} in books</h2>
+      <select id="year-select" aria-label="Select year">
+        {year_options}
+      </select>
+    </div>
+    <ul id="year-book-list" class="book-list stats-book-list"></ul>
+  </div>
+
+  <div class="stats-section">
+    <h2 class="stats-section-heading">By category</h2>
+    <div id="category-chart"></div>
+  </div>
+</main>
+<script id="stats-data" type="application/json">{data}</script>
+<script src="stats.js"></script>"""
+
+    return page("Reading Stats", "", body, depth=0)
 
 
 def render_book(book):
@@ -335,6 +456,7 @@ def main():
         )
 
     (SITE_DIR / "index.html").write_text(render_index(books), encoding="utf-8")
+    (SITE_DIR / "stats.html").write_text(render_stats(books), encoding="utf-8")
     for book in books:
         (SITE_DIR / "books" / f"{book['slug']}.html").write_text(
             render_book(book), encoding="utf-8"
@@ -343,7 +465,7 @@ def main():
     (SITE_DIR / "books.csv").write_text(render_csv(books), encoding="utf-8")
     (SITE_DIR / "feed.rss").write_text(render_rss(books), encoding="utf-8")
 
-    for asset in ("index.js", "style.css"):
+    for asset in ("index.js", "stats.js", "style.css"):
         shutil.copy(STATIC_DIR / asset, SITE_DIR / asset)
     (SITE_DIR / ".nojekyll").write_text("", encoding="utf-8")
 
