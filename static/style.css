@@ -102,6 +102,8 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
 .badge-nonfiction { background: var(--nonfiction); }
 .tag { background: var(--bg); border: 1px solid var(--border); color: var(--muted); }
 
+.stars { color: #e0a106; font-size: 0.8rem; letter-spacing: 0.05em; }
+
 .card-date { margin-left: auto; color: var(--muted); }
 
 .empty { color: var(--muted); text-align: center; margin-top: 2rem; }

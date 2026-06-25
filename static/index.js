@@ -27,7 +27,13 @@ const SORTERS = {
   started: (a, b) => cmpDesc(a.started, b.started),
   title: (a, b) => a.title.localeCompare(b.title),
   author: (a, b) => a.author.localeCompare(b.author) || a.title.localeCompare(b.title),
+  stars: (a, b) => (b.stars || 0) - (a.stars || 0) ||
+                   cmpDesc(a.finished || a.started, b.finished || b.started),
 };
+
+function starsDisplay(n) {
+  return n ? "★".repeat(n) + "☆".repeat(5 - n) : "";
+}
 
 function cmpDesc(a, b) {
   // Empty dates sort last; otherwise newest first (ISO strings compare lexically).
@@ -66,6 +72,9 @@ function card(b) {
                      (b.finished ? "Finished " : "Started ");
   const date = dateLabel ? `<span class="card-date">${datePrefix}${formatDate(dateLabel)}</span>` : "";
   const tags = b.tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("");
+  const stars = b.stars
+    ? `<span class="stars" aria-label="${b.stars} of 5 stars">${starsDisplay(b.stars)}</span>`
+    : "";
   return `<li class="card">
     <a class="card-link" href="books/${encodeURIComponent(b.slug)}.html">
       <span class="card-title">${escapeHtml(b.title)}</span>
@@ -73,6 +82,7 @@ function card(b) {
     </a>
     <div class="card-meta">
       <span class="badge badge-${escapeHtml(b.category)}">${escapeHtml(b.category)}</span>
+      ${stars}
       ${tags}
       ${date}
     </div>
