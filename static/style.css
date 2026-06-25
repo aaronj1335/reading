@@ -43,6 +43,9 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
 .site-header { padding-top: 1.5rem; padding-bottom: 0.25rem; }
 .site-header h1 { margin: 0; font-size: 1.7rem; letter-spacing: -0.01em; }
 .site-header .count { margin: 0.1rem 0 0; color: var(--muted); font-size: 0.9rem; }
+.site-header .exports { margin: 0.4rem 0 0; font-size: 0.8rem; display: flex; gap: 0.75rem; }
+.site-header .exports a { color: var(--muted); text-decoration: none; }
+.site-header .exports a:hover { color: var(--accent); }
 
 /* ---- Controls: docked to the bottom (thumb zone) on mobile ---- */
 .controls {
