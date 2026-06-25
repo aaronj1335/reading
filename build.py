@@ -14,12 +14,15 @@ parses them and renders:
 No template engine: pages are assembled with plain Python string helpers.
 """
 import colorsys
+import csv
 import hashlib
 import html
+import io
 import json
 import re
 import shutil
 import textwrap
+from datetime import date as _date
 from pathlib import Path
 
 import markdown
@@ -156,6 +159,10 @@ def render_index(books):
     body = f"""<header class="site-header">
   <h1>Reading</h1>
   <p class="count"><span id="count">{len(books)}</span> books</p>
+  <nav class="exports">
+    <a href="books.csv" download>CSV</a>
+    <a href="feed.rss">RSS</a>
+  </nav>
 </header>
 <main>
   {controls}
@@ -260,6 +267,60 @@ font-style="italic">{author_tspans}</text>
 """
 
 
+def render_csv(books):
+    """Generate a CSV export of all books."""
+    out = io.StringIO()
+    writer = csv.writer(out)
+    writer.writerow(["title", "author", "finished", "started", "category", "tags", "stars"])
+    for book in books:
+        writer.writerow([
+            book["title"],
+            book["author"],
+            book["finished"],
+            book["started"],
+            book["category"],
+            ", ".join(book["tags"]),
+            book["stars"] or "",
+        ])
+    return out.getvalue()
+
+
+def render_rss(books):
+    """Generate an RSS 2.0 feed of finished books, most recent first."""
+    items = []
+    for book in books:
+        if not book["finished"]:
+            continue
+        try:
+            d = _date.fromisoformat(book["finished"])
+            pub_date = d.strftime("%a, %d %b %Y 00:00:00 +0000")
+        except ValueError:
+            pub_date = ""
+        stars_text = f" {stars_display(book['stars'])}" if book["stars"] else ""
+        desc = e(f'{book["author"]}{stars_text}')
+        items.append(
+            f"    <item>\n"
+            f"      <title>{e(book['title'])}</title>\n"
+            f"      <link>books/{e(book['slug'])}.html</link>\n"
+            f"      <description>{desc}</description>\n"
+            f"      <pubDate>{pub_date}</pubDate>\n"
+            f"      <guid isPermaLink=\"false\">{e(book['slug'])}</guid>\n"
+            f"    </item>"
+        )
+    items_str = "\n".join(items)
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0">\n'
+        "  <channel>\n"
+        "    <title>Reading</title>\n"
+        "    <link>index.html</link>\n"
+        "    <description>Books I&#39;ve read</description>\n"
+        f"{items_str}\n"
+        "  </channel>\n"
+        "</rss>\n"
+    )
+
+
 def main():
     if SITE_DIR.exists():
         shutil.rmtree(SITE_DIR)
@@ -278,6 +339,9 @@ def main():
         (SITE_DIR / "books" / f"{book['slug']}.html").write_text(
             render_book(book), encoding="utf-8"
         )
+
+    (SITE_DIR / "books.csv").write_text(render_csv(books), encoding="utf-8")
+    (SITE_DIR / "feed.rss").write_text(render_rss(books), encoding="utf-8")
 
     for asset in ("index.js", "style.css"):
         shutil.copy(STATIC_DIR / asset, SITE_DIR / asset)
