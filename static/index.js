@@ -75,17 +75,26 @@ function card(b) {
   const stars = b.stars
     ? `<span class="stars" aria-label="${b.stars} of 5 stars">${starsDisplay(b.stars)}</span>`
     : "";
+  const slug = encodeURIComponent(b.slug);
+  const fallback = `covers/${slug}.svg`;
+  const coverSrc = b.cover || fallback;
+  const onerror = b.cover
+    ? ` onerror="this.onerror=null;this.src='${fallback}'"`
+    : "";
   return `<li class="card">
-    <a class="card-link" href="books/${encodeURIComponent(b.slug)}.html">
-      <span class="card-title">${escapeHtml(b.title)}</span>
-      <span class="card-author">${escapeHtml(b.author)}</span>
+    <a class="card-link" href="books/${slug}.html">
+      <img class="card-cover" src="${escapeHtml(coverSrc)}"${onerror} alt="" width="300" height="450" loading="lazy">
+      <span class="card-text">
+        <span class="card-title">${escapeHtml(b.title)}</span>
+        <span class="card-author">${escapeHtml(b.author)}</span>
+        <span class="card-meta">
+          <span class="badge badge-${escapeHtml(b.category)}">${escapeHtml(b.category)}</span>
+          ${stars}
+          ${tags}
+          ${date}
+        </span>
+      </span>
     </a>
-    <div class="card-meta">
-      <span class="badge badge-${escapeHtml(b.category)}">${escapeHtml(b.category)}</span>
-      ${stars}
-      ${tags}
-      ${date}
-    </div>
   </li>`;
 }
 
