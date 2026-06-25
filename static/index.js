@@ -44,12 +44,28 @@ function cmpDesc(a, b) {
   return a < b ? 1 : -1;
 }
 
+function updateUrl() {
+  const params = new URLSearchParams();
+  const q = searchEl.value.trim();
+  const cat = categoryEl.value;
+  const tag = tagEl.value;
+  const sort = sortEl.value;
+  if (q) params.set("q", q);
+  if (cat) params.set("category", cat);
+  if (tag) params.set("tag", tag);
+  if (sort && sort !== "finished") params.set("sort", sort);
+  const qs = params.toString();
+  history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+}
+
 function render() {
   const q = searchEl.value.trim().toLowerCase();
   const cat = categoryEl.value;
   const tag = tagEl.value;
   const excludeTag = excludeTagEl.value;
   const sort = sortEl.value;
+
+  updateUrl();
 
   let books = BOOKS.filter((b) => {
     if (cat && b.category !== cat) return false;
@@ -110,5 +126,14 @@ function escapeHtml(s) {
 [searchEl, categoryEl, tagEl, excludeTagEl, sortEl].forEach((el) =>
   el.addEventListener("input", render)
 );
+
+// Restore state from URL query params on load.
+(function () {
+  const params = new URLSearchParams(location.search);
+  if (params.has("q")) searchEl.value = params.get("q");
+  if (params.has("category")) categoryEl.value = params.get("category");
+  if (params.has("tag")) tagEl.value = params.get("tag");
+  if (params.has("sort")) sortEl.value = params.get("sort");
+})();
 
 render();
