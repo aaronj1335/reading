@@ -1,0 +1,8 @@
+---
+title: Breakfast of Champions
+author: Kurt Vonnegut Jr.
+finished: 2018-11-11
+started: 2018-10-06
+category: fiction
+tags: []
+---

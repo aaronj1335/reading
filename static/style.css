@@ -1,0 +1,142 @@
+:root {
+  --bg: #fbfaf7;
+  --surface: #ffffff;
+  --text: #1d1c1a;
+  --muted: #6b6660;
+  --border: #e7e3dc;
+  --accent: #7a5c3e;
+  --fiction: #3a6b8f;
+  --nonfiction: #6a7a3a;
+  --radius: 10px;
+  --maxw: 720px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.45;
+  /* leave room for the fixed bottom control bar on mobile */
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
+
+.site-header { padding-top: 1.5rem; padding-bottom: 0.25rem; }
+.site-header h1 { margin: 0; font-size: 1.7rem; letter-spacing: -0.01em; }
+.site-header .count { margin: 0.1rem 0 0; color: var(--muted); font-size: 0.9rem; }
+
+/* ---- Controls: docked to the bottom (thumb zone) on mobile ---- */
+.controls {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 0.6rem 1rem calc(0.6rem + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.controls input,
+.controls select {
+  font-size: 16px; /* avoids iOS zoom-on-focus */
+  font-family: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.75rem;
+  min-height: 44px; /* comfortable tap target */
+}
+
+.controls input:focus,
+.controls select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.filters { display: flex; gap: 0.5rem; }
+.filters select { flex: 1; min-width: 0; }
+
+/* ---- Book list ---- */
+.book-list { list-style: none; margin: 1rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.85rem 1rem;
+}
+
+.card-link { text-decoration: none; color: inherit; display: block; }
+.card-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.card-title { display: block; font-weight: 600; font-size: 1.05rem; }
+.card-author { display: block; color: var(--muted); font-size: 0.92rem; }
+
+.card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+  font-size: 0.8rem;
+}
+
+.badge, .tag {
+  display: inline-block;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+.badge { color: #fff; text-transform: capitalize; }
+.badge-fiction { background: var(--fiction); }
+.badge-nonfiction { background: var(--nonfiction); }
+.tag { background: var(--bg); border: 1px solid var(--border); color: var(--muted); }
+
+.card-date { margin-left: auto; color: var(--muted); }
+
+.empty { color: var(--muted); text-align: center; margin-top: 2rem; }
+
+/* ---- Book detail page ---- */
+.book-page { max-width: var(--maxw); margin: 0 auto; padding: 1.5rem 1rem; }
+.book-page h1 { margin: 0.3rem 0 0.2rem; font-size: 1.6rem; }
+.book-page .author { color: var(--muted); margin: 0 0 1.2rem; font-size: 1.05rem; }
+.back { color: var(--accent); text-decoration: none; font-size: 0.9rem; }
+.back:hover { text-decoration: underline; }
+
+.meta { border-top: 1px solid var(--border); }
+.meta-row { display: flex; gap: 1rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); }
+.meta-label { width: 6.5rem; color: var(--muted); flex-shrink: 0; }
+.meta-value { text-transform: capitalize; }
+.book-body { margin-top: 1.4rem; }
+
+/* ---- Wider screens: controls move to the top ---- */
+@media (min-width: 700px) {
+  body { padding-bottom: 2rem; }
+  .controls {
+    position: sticky;
+    top: 0;
+    bottom: auto;
+    box-shadow: none;
+    border-top: none;
+    border-bottom: 1px solid var(--border);
+    flex-direction: row;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    max-width: var(--maxw);
+    margin: 1rem auto 0;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+  .controls input { flex: 1; }
+  .filters { flex: 0 0 auto; }
+}
