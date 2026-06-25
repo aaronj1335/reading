@@ -10,7 +10,11 @@ searchable site that's deployed to GitHub Pages.
   source of truth; edit these by hand.
 - **`build.py`** — reads every `books/*.md` and generates `_site/`: an `index.html`
   with a searchable/filterable/sortable list plus one page per book. No template
-  engine, no JS frameworks (just a CDN CSS reset).
+  engine, no JS frameworks (just a CDN CSS reset). It also generates a cover image
+  (`_site/covers/<slug>.svg`) for every book — a self-contained SVG with the title
+  and author over a colour derived from the title, so each book always looks the
+  same. Nothing is fetched at build time, so there's no dependency on external
+  cover services.
 - **`.github/workflows/build.yml`** — on every push to `main`, runs the build and
   deploys `_site/` straight to GitHub Pages (no `gh-pages` branch; the site is
   uploaded as a Pages artifact).

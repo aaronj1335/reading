@@ -13,10 +13,13 @@ parses them and renders:
 
 No template engine: pages are assembled with plain Python string helpers.
 """
+import colorsys
+import hashlib
 import html
 import json
 import re
 import shutil
+import textwrap
 from pathlib import Path
 
 import markdown
@@ -153,12 +156,72 @@ def render_book(book):
     body_html = f'<div class="book-body">{book["body_html"]}</div>' if book["body_html"] else ""
     body = f"""<article class="book-page">
   <p><a class="back" href="../index.html">← All books</a></p>
-  <h1>{e(book["title"])}</h1>
-  <p class="author">{e(book["author"])}</p>
-  <div class="meta">{meta_html}</div>
+  <div class="book-header">
+    <img class="book-cover" src="../covers/{e(book["slug"])}.svg" alt="" width="300" height="450">
+    <div class="book-header-text">
+      <h1>{e(book["title"])}</h1>
+      <p class="author">{e(book["author"])}</p>
+      <div class="meta">{meta_html}</div>
+    </div>
+  </div>
   {body_html}
 </article>"""
     return page(book["title"], "", body, depth=1)
+
+
+def cover_svg(book):
+    """Generate a self-contained SVG cover for a book.
+
+    No real cover art is fetched (the build stays offline and dependency-free);
+    instead each book gets a deterministic, readable cover whose colours are
+    derived from a hash of its title so the same book always looks the same.
+    """
+    W, H = 300, 450
+    seed = int(hashlib.sha1(book["slug"].encode("utf-8")).hexdigest(), 16)
+    hue = (seed % 360) / 360.0
+    # Two tones of the same hue for a subtle vertical gradient.
+    top = colorsys.hls_to_rgb(hue, 0.34, 0.45)
+    bottom = colorsys.hls_to_rgb(hue, 0.22, 0.50)
+
+    def hex_color(rgb):
+        return "#" + "".join(f"{int(c * 255):02x}" for c in rgb)
+
+    # Wrap the title to fit the cover width (rough char budget per line).
+    title_lines = textwrap.wrap(book["title"], width=16) or [""]
+    title_lines = title_lines[:5]
+    line_h = 30
+    start_y = H / 2 - (len(title_lines) - 1) * line_h / 2 - 20
+    title_tspans = "".join(
+        f'<tspan x="{W / 2}" y="{start_y + i * line_h:.0f}">{e(line)}</tspan>'
+        for i, line in enumerate(title_lines)
+    )
+
+    author_lines = textwrap.wrap(book["author"], width=22)[:2]
+    author_tspans = "".join(
+        f'<tspan x="{W / 2}" y="{H - 46 + i * 20:.0f}">{e(line)}</tspan>'
+        for i, line in enumerate(author_lines)
+    )
+
+    grad_id = f"g{seed % 100000}"
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" \
+role="img" aria-label="{e(book['title'])} by {e(book['author'])}">
+  <defs>
+    <linearGradient id="{grad_id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="{hex_color(top)}"/>
+      <stop offset="1" stop-color="{hex_color(bottom)}"/>
+    </linearGradient>
+  </defs>
+  <rect width="{W}" height="{H}" fill="url(#{grad_id})"/>
+  <rect x="14" y="14" width="{W - 28}" height="{H - 28}" fill="none" \
+stroke="rgba(255,255,255,0.35)" stroke-width="1.5"/>
+  <rect x="0" y="0" width="10" height="{H}" fill="rgba(0,0,0,0.18)"/>
+  <text text-anchor="middle" fill="#fff" font-family="Georgia, 'Times New Roman', serif" \
+font-size="24" font-weight="600">{title_tspans}</text>
+  <text text-anchor="middle" fill="rgba(255,255,255,0.85)" \
+font-family="Georgia, 'Times New Roman', serif" font-size="14" \
+font-style="italic">{author_tspans}</text>
+</svg>
+"""
 
 
 def main():
@@ -167,6 +230,12 @@ def main():
     (SITE_DIR / "books").mkdir(parents=True)
 
     books = load_books()
+
+    (SITE_DIR / "covers").mkdir()
+    for book in books:
+        (SITE_DIR / "covers" / f"{book['slug']}.svg").write_text(
+            cover_svg(book), encoding="utf-8"
+        )
 
     (SITE_DIR / "index.html").write_text(render_index(books), encoding="utf-8")
     for book in books:

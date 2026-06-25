@@ -66,16 +66,20 @@ function card(b) {
                      (b.finished ? "Finished " : "Started ");
   const date = dateLabel ? `<span class="card-date">${datePrefix}${formatDate(dateLabel)}</span>` : "";
   const tags = b.tags.map((t) => `<span class="tag">${escapeHtml(t)}</span>`).join("");
+  const slug = encodeURIComponent(b.slug);
   return `<li class="card">
-    <a class="card-link" href="books/${encodeURIComponent(b.slug)}.html">
-      <span class="card-title">${escapeHtml(b.title)}</span>
-      <span class="card-author">${escapeHtml(b.author)}</span>
+    <a class="card-link" href="books/${slug}.html">
+      <img class="card-cover" src="covers/${slug}.svg" alt="" width="300" height="450" loading="lazy">
+      <span class="card-text">
+        <span class="card-title">${escapeHtml(b.title)}</span>
+        <span class="card-author">${escapeHtml(b.author)}</span>
+        <span class="card-meta">
+          <span class="badge badge-${escapeHtml(b.category)}">${escapeHtml(b.category)}</span>
+          ${tags}
+          ${date}
+        </span>
+      </span>
     </a>
-    <div class="card-meta">
-      <span class="badge badge-${escapeHtml(b.category)}">${escapeHtml(b.category)}</span>
-      ${tags}
-      ${date}
-    </div>
   </li>`;
 }
 
