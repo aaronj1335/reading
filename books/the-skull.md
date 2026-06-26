@@ -1,6 +1,7 @@
 ---
 title: The Skull
 author: Jon Klassen
+isbn: 9781536223361
 finished:
 started: 2024-02-12
 stars: 5
