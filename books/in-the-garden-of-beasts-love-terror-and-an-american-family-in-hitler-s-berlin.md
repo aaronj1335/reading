@@ -6,5 +6,4 @@ finished: 2023-03-25
 started: 2019-12-10
 stars: 4
 category: nonfiction
-tags: []
 ---

@@ -2,9 +2,8 @@
 title: The Sun Also Rises
 author: Ernest Hemingway
 isbn: 9780743297332
-finished:
+finished: 2021-01-23
 started: 2020-12-02
-stars: 5
+stars: 4
 category: fiction
-tags: []
 ---

@@ -4,7 +4,6 @@ author: xorpd
 isbn: 9781502958082
 finished:
 started: 2021-09-02
-stars: 5
+stars: 3
 category: nonfiction
-tags: []
 ---

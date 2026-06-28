@@ -6,5 +6,4 @@ finished:
 started: 2021-04-30
 stars: 3
 category: nonfiction
-tags: []
 ---

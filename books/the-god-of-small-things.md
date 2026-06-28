@@ -6,5 +6,4 @@ finished: 2017-09-30
 started: 2017-08-24
 stars: 5
 category: fiction
-tags: []
 ---

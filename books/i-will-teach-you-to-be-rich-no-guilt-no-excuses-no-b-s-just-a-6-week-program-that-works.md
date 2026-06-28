@@ -6,5 +6,4 @@ finished:
 started: 2019-07-07
 stars: 2
 category: nonfiction
-tags: []
 ---
