@@ -80,7 +80,6 @@ function render() {
 
   books = books.slice().sort(SORTERS[sort] || SORTERS.finished);
 
-  countEl.textContent = books.length;
   emptyEl.hidden = books.length > 0;
   listEl.innerHTML = books.map(card).join("");
 }
