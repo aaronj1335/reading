@@ -2,9 +2,9 @@
 title: Odder
 author: Katherine Applegate
 isbn: 9781250147424
-finished:
+finished: 2024-05-17
 started: 2024-03-26
 stars: 5
 category: fiction
-tags: []
+tags: [read-with-kids]
 ---

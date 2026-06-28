@@ -4,7 +4,7 @@ author: Ralph Ellison
 isbn: 9780679732761
 finished: 2023-08-10
 started: 2022-09-25
-stars: 4
+stars: 3
 category: fiction
 tags: []
 ---
