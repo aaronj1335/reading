@@ -7,3 +7,7 @@ started: 2022-04-12
 stars: 4
 category: fiction
 ---
+
+I struggled to find Anna Karenina's character as compelling as she probably should be.
+
+Really enjoyed Levin's development though.

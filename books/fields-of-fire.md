@@ -7,3 +7,5 @@ started: 2004-02-02
 stars: 5
 category: fiction
 ---
+
+The idea of "your own personal Vietnam" was really powerful to me, and only became more meaningful once I ended up getting deployed to Iraq.

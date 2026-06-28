@@ -7,3 +7,5 @@ started: 2022-03-19
 stars: 4
 category: fiction
 ---
+
+An unreliable narrator trying to make sense of how WWII happened to Japan from the lens of a family patriarch. So good.

@@ -7,3 +7,7 @@ started: 2024-12-30
 stars: 5
 category: nonfiction
 ---
+
+Some idealistic Berkley socialists messed around and ended up giving capitalism the most devastating weapon in history.
+
+It's tempting to think of this as a cautionary tale of what happens when people apply scientific advancements without thinking of the broader human impact. But the people involved really cared deeply about that, so maybe it says more about how far war pushes us, especially war on a global scale.
