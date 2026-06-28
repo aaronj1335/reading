@@ -170,7 +170,6 @@ def render_index(books):
     <h1>Reading</h1>
     <a class="site-nav-link" href="stats.html">Stats</a>
   </div>
-  <p class="count"><span id="count">{len(books)}</span> books</p>
   <nav class="exports">
     <a href="books.csv" download>CSV</a>
     <a href="feed.rss">RSS</a>
