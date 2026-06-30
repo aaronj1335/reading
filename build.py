@@ -195,6 +195,9 @@ def render_stats(books):
 
     years = sorted(by_year.keys())
 
+    # Chart spans every year in the range, filling gaps with zero counts so the
+    # line dips to the axis for years with no finished books.
+    chart_years = range(years[0], years[-1] + 1) if years else []
     by_year_data = [
         {
             "year": yr,
@@ -202,7 +205,7 @@ def render_stats(books):
             "fiction": sum(1 for b in by_year[yr] if b["category"] == "fiction"),
             "nonfiction": sum(1 for b in by_year[yr] if b["category"] == "nonfiction"),
         }
-        for yr in years
+        for yr in chart_years
     ]
 
     book_fields = ("slug", "title", "author", "finished", "stars", "category", "tags", "cover", "pages")

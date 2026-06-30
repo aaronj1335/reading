@@ -10,7 +10,7 @@
     if (!container || data.by_year.length < 1) return;
 
     const W = 560, H = 180;
-    const ML = 36, MT = 16, MR = 20, MB = 40;
+    const ML = 36, MT = 16, MR = 20, MB = 52;
     const plotW = W - ML - MR;
     const plotH = H - MT - MB;
 
@@ -46,8 +46,9 @@
       `${xScale(minYear).toFixed(1)},${bottomY} ${pts} ` +
       `${xScale(maxYear).toFixed(1)},${bottomY}`;
 
-    // Interactive dots
+    // Interactive dots (skip years with no books — line still dips to zero)
     const dots = data.by_year
+      .filter((d) => d.count > 0)
       .map(
         (d) =>
           `<circle cx="${xScale(d.year).toFixed(1)}" cy="${yScale(d.count).toFixed(1)}" r="5" ` +
@@ -57,13 +58,16 @@
       )
       .join("");
 
-    // X-axis year labels
+    // X-axis year labels, rotated vertical so they don't crowd each other
+    const labelY = H - MB + 12;
     const xLabels = years
-      .map(
-        (yr) =>
-          `<text x="${xScale(yr).toFixed(1)}" y="${H - MB + 18}" ` +
-          `text-anchor="middle" class="chart-label">${yr}</text>`
-      )
+      .map((yr) => {
+        const x = xScale(yr).toFixed(1);
+        return (
+          `<text x="${x}" y="${labelY}" text-anchor="end" ` +
+          `class="chart-label" transform="rotate(-90 ${x} ${labelY})">${yr}</text>`
+        );
+      })
       .join("");
 
     container.innerHTML =
