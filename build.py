@@ -170,10 +170,6 @@ def render_index(books):
     <h1>Reading</h1>
     <a class="site-nav-link" href="stats.html">Stats</a>
   </div>
-  <nav class="exports">
-    <a href="books.csv" download>CSV</a>
-    <a href="feed.rss">RSS</a>
-  </nav>
 </header>
 <main>
   {controls}
@@ -247,6 +243,10 @@ def render_stats(books):
     <a class="site-nav-link" href="index.html">All books</a>
   </div>
   <p class="count">{e(year_range)}</p>
+  <nav class="exports">
+    <a href="books.csv" download>CSV</a>
+    <a href="feed.rss">RSS</a>
+  </nav>
 </header>
 <main class="stats-page">
   <div class="stats-row">
