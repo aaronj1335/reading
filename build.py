@@ -26,6 +26,7 @@ import shutil
 import textwrap
 from collections import defaultdict
 from datetime import date as _date
+from statistics import median
 from pathlib import Path
 
 import markdown
@@ -220,7 +221,10 @@ def render_stats(books):
     pages_fiction = sum(b["pages"] for b in books if b["pages"] and b["category"] == "fiction")
     pages_nonfiction = sum(b["pages"] for b in books if b["pages"] and b["category"] == "nonfiction")
 
-    avg_per_year = round(len(finished) / len(years), 1) if years else 0
+    # Median books finished per year, considering only years with at least one
+    # finished book (years with zero reads are not tracked in `years`).
+    per_year_counts = sorted(len(by_year[yr]) for yr in years)
+    median_per_year = round(median(per_year_counts), 1) if per_year_counts else 0
     default_year = str(years[-1]) if years else ""
 
     # Rating distribution: how many books carry each 1–5 star rating
@@ -230,7 +234,7 @@ def render_stats(books):
     stats_data = {
         "total": len(books),
         "finished": len(finished),
-        "avg_per_year": avg_per_year,
+        "median_per_year": median_per_year,
         "by_year": by_year_data,
         "by_category": {"fiction": fiction_count, "nonfiction": nonfiction_count},
         "by_rating": by_rating,
@@ -267,8 +271,8 @@ def render_stats(books):
       <div class="stat-lbl">Years tracked</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num">{avg_per_year}</div>
-      <div class="stat-lbl">Avg&nbsp;finished / year</div>
+      <div class="stat-num">{median_per_year}</div>
+      <div class="stat-lbl">Median&nbsp;finished / year</div>
     </div>
   </div>
 
