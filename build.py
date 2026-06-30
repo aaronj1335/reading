@@ -199,6 +199,7 @@ def render_stats(books):
         {
             "year": yr,
             "count": len(by_year[yr]),
+            "pages": sum(b["pages"] for b in by_year[yr] if b["pages"]),
             "fiction": sum(1 for b in by_year[yr] if b["category"] == "fiction"),
             "nonfiction": sum(1 for b in by_year[yr] if b["category"] == "nonfiction"),
         }
@@ -249,6 +250,18 @@ def render_stats(books):
     )
     year_range = f"{years[0]}–{years[-1]}" if len(years) > 1 else (str(years[0]) if years else "")
 
+    # Show a Books/Pages metric toggle on the year chart only when at least one
+    # finished book carries a page count (otherwise "Pages" would be all zero).
+    has_year_pages = any(d["pages"] for d in by_year_data)
+    year_chart_toggle = (
+        """<div class="chart-toggle" id="year-chart-toggle" role="group" aria-label="Chart metric">
+        <button type="button" class="chart-toggle-btn is-active" data-metric="count" aria-pressed="true">Books</button>
+        <button type="button" class="chart-toggle-btn" data-metric="pages" aria-pressed="false">Pages</button>
+      </div>"""
+        if has_year_pages
+        else ""
+    )
+
     body = f"""<header class="site-header">
   <div class="site-header-row">
     <h1>Reading Stats</h1>
@@ -277,7 +290,10 @@ def render_stats(books):
   </div>
 
   <div class="stats-section">
-    <h2 class="stats-section-heading">Books finished per year</h2>
+    <div class="stats-section-header">
+      <h2 class="stats-section-heading">Books finished per year</h2>
+      {year_chart_toggle}
+    </div>
     <div id="year-chart-container" class="chart-container"></div>
   </div>
 

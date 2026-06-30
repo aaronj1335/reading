@@ -239,6 +239,33 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
   outline-offset: 1px;
 }
 
+/* Books / Pages metric toggle on the year chart */
+.chart-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.chart-toggle-btn {
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: var(--bg);
+  border: none;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+.chart-toggle-btn + .chart-toggle-btn { border-left: 1px solid var(--border); }
+.chart-toggle-btn.is-active {
+  color: var(--bg);
+  background: var(--accent);
+}
+.chart-toggle-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 .chart-container { overflow-x: auto; }
 
 /* SVG chart primitives (filled by JS) */
