@@ -137,6 +137,17 @@
     );
   }
 
+  // Split an `Everything: after a colon` subtitle onto its own line. Text before
+  // the first colon is the main title; text after it becomes a `.subtitle` span
+  // (smaller, italic, not bold). Titles with no colon render unchanged.
+  function titleHtml(title) {
+    const i = title.indexOf(":");
+    if (i === -1) return escapeHtml(title);
+    const subtitle = title.slice(i + 1).trim();
+    if (!subtitle) return escapeHtml(title);
+    return `${escapeHtml(title.slice(0, i).trim())}<span class="subtitle">${escapeHtml(subtitle)}</span>`;
+  }
+
   function starsDisplay(n) {
     return n ? "★".repeat(n) + "☆".repeat(5 - n) : "";
   }
@@ -175,7 +186,7 @@
           `<a class="card-link" href="books/${slug}.html">` +
           `<img class="card-cover" src="${imgSrc}"${onerror} alt="" width="300" height="450" loading="lazy">` +
           `<span class="card-text">` +
-          `<span class="card-title">${escapeHtml(b.title)}</span>` +
+          `<span class="card-title">${titleHtml(b.title)}</span>` +
           `<span class="card-author">${escapeHtml(b.author)}</span>` +
           `<span class="card-meta">${catBadge}${stars}${tagBadges}${date}</span>` +
           `</span></a></li>`

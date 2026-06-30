@@ -129,6 +129,18 @@ def page(title, head_extra, body, depth):
     )
 
 
+def title_html(title):
+    """Render a title, splitting an `Everything: after a colon` subtitle onto its
+    own line. Everything before the first colon is the main title; everything
+    after it becomes a `.subtitle` span (smaller, italic, not bold). Titles with
+    no colon — or an empty subtitle — render unchanged."""
+    main, sep, subtitle = title.partition(":")
+    subtitle = subtitle.strip()
+    if not sep or not subtitle:
+        return e(title)
+    return f'{e(main.strip())}<span class="subtitle">{e(subtitle)}</span>'
+
+
 def stars_display(n):
     """Render a 1–5 rating as filled/empty stars; empty string when unrated."""
     return "★" * n + "☆" * (5 - n) if n else ""
@@ -265,7 +277,7 @@ def render_book(book):
     body = template("book.template.html").format(
         cover_src=cover_src,
         onerror=onerror,
-        title=e(book["title"]),
+        title_html=title_html(book["title"]),
         author=e(book["author"]),
         meta_html=meta_html,
         body_html=body_html,

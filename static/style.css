@@ -108,6 +108,9 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
 }
 .card-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .card-title { display: block; font-weight: 600; font-size: 1.05rem; }
+/* Subtitle (text after the first colon in a title): its own line, slightly
+   smaller, italic, and not bold — in both card titles and the book-page h1. */
+.subtitle { display: block; font-size: 0.82em; font-weight: 400; font-style: italic; line-height: 1.25; }
 .card-author { display: block; color: var(--muted); font-size: 0.92rem; }
 
 .card-meta {
