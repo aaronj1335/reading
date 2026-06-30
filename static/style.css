@@ -106,7 +106,7 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
   object-fit: cover;
 }
-.card-text { display: flex; flex-direction: column; min-width: 0; }
+.card-text { display: flex; flex-direction: column; min-width: 0; flex: 1; }
 .card-title { display: block; font-weight: 600; font-size: 1.05rem; }
 .card-author { display: block; color: var(--muted); font-size: 0.92rem; }
 
