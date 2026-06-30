@@ -3,11 +3,35 @@
 (function () {
   const data = JSON.parse(document.getElementById("stats-data").textContent);
 
-  // ── SVG line chart: books finished per year ───────────────────────────────
+  // ── SVG line chart: books finished / pages read per year ──────────────────
 
-  function renderYearChart() {
+  // Pick a "nice" round grid step (1/2/5 × 10ⁿ) for ~`ticks` divisions so the
+  // same code reads well for small book counts and large page totals alike.
+  function niceStep(max, ticks) {
+    const rough = max / ticks;
+    const mag = Math.pow(10, Math.floor(Math.log10(rough)));
+    const norm = rough / mag;
+    const step = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10;
+    return step * mag;
+  }
+
+  // Compact axis labels: 1200 → "1.2k", 12000 → "12k", 8 → "8".
+  function fmtCompact(n) {
+    if (n >= 1000) {
+      const k = n / 1000;
+      return (Number.isInteger(k) ? k : k.toFixed(1)) + "k";
+    }
+    return String(n);
+  }
+
+  let currentMetric = "count";
+
+  function renderYearChart(metric) {
     const container = document.getElementById("year-chart-container");
     if (!container || data.by_year.length < 1) return;
+
+    const isPages = metric === "pages";
+    const noun = isPages ? "page" : "book";
 
     const W = 560, H = 180;
     const ML = 36, MT = 16, MR = 20, MB = 52;
@@ -15,29 +39,29 @@
     const plotH = H - MT - MB;
 
     const years = data.by_year.map((d) => d.year);
-    const counts = data.by_year.map((d) => d.count);
-    const maxCount = Math.max(...counts);
+    const values = data.by_year.map((d) => (isPages ? d.pages || 0 : d.count));
+    const maxValue = Math.max(1, ...values);
     const minYear = years[0];
     const maxYear = years[years.length - 1];
     const yearSpan = maxYear - minYear || 1;
 
     const xScale = (yr) => ML + ((yr - minYear) / yearSpan) * plotW;
-    const yScale = (n) => MT + (1 - n / maxCount) * plotH;
+    const yScale = (n) => MT + (1 - n / maxValue) * plotH;
 
     // Y-axis grid lines
-    const gridStep = maxCount <= 5 ? 1 : maxCount <= 10 ? 2 : 5;
+    const gridStep = niceStep(maxValue, 5);
     let gridLines = "";
-    for (let v = 0; v <= maxCount; v += gridStep) {
+    for (let v = 0; v <= maxValue; v += gridStep) {
       const yv = yScale(v).toFixed(1);
       gridLines +=
         `<line x1="${ML}" y1="${yv}" x2="${W - MR}" y2="${yv}" class="chart-grid"/>` +
         `<text x="${ML - 6}" y="${(parseFloat(yv) + 4).toFixed(1)}" ` +
-        `text-anchor="end" class="chart-label">${v}</text>`;
+        `text-anchor="end" class="chart-label">${fmtCompact(v)}</text>`;
     }
 
     // Polyline points
     const pts = data.by_year
-      .map((d) => `${xScale(d.year).toFixed(1)},${yScale(d.count).toFixed(1)}`)
+      .map((d, i) => `${xScale(d.year).toFixed(1)},${yScale(values[i]).toFixed(1)}`)
       .join(" ");
 
     // Area fill polygon: trace line then close along the bottom
@@ -46,14 +70,15 @@
       `${xScale(minYear).toFixed(1)},${bottomY} ${pts} ` +
       `${xScale(maxYear).toFixed(1)},${bottomY}`;
 
-    // Interactive dots (skip years with no books — line still dips to zero)
+    // Interactive dots (skip empty years — line still dips to zero)
     const dots = data.by_year
-      .filter((d) => d.count > 0)
+      .map((d, i) => ({ year: d.year, value: values[i] }))
+      .filter((d) => d.value > 0)
       .map(
         (d) =>
-          `<circle cx="${xScale(d.year).toFixed(1)}" cy="${yScale(d.count).toFixed(1)}" r="5" ` +
+          `<circle cx="${xScale(d.year).toFixed(1)}" cy="${yScale(d.value).toFixed(1)}" r="5" ` +
           `class="chart-dot" data-year="${d.year}" tabindex="0" ` +
-          `role="button" aria-label="${d.year}: ${d.count} book${d.count !== 1 ? "s" : ""}"` +
+          `role="button" aria-label="${d.year}: ${d.value.toLocaleString()} ${noun}${d.value !== 1 ? "s" : ""}"` +
           `/>`
       )
       .join("");
@@ -72,7 +97,7 @@
 
     container.innerHTML =
       `<svg viewBox="0 0 ${W} ${H}" width="100%" class="year-chart-svg" ` +
-      `role="img" aria-label="Books finished per year">` +
+      `role="img" aria-label="${isPages ? "Pages read" : "Books finished"} per year">` +
       `<defs><linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">` +
       `<stop offset="0%" class="area-stop-top"/>` +
       `<stop offset="100%" class="area-stop-bottom"/>` +
@@ -256,7 +281,25 @@
     renderYearBooks(yearSelect.value);
   }
 
-  renderYearChart();
+  // Books / Pages metric toggle for the year chart
+  const yearChartToggle = document.getElementById("year-chart-toggle");
+  if (yearChartToggle) {
+    yearChartToggle.addEventListener("click", function (e) {
+      const btn = e.target.closest(".chart-toggle-btn");
+      if (!btn) return;
+      const metric = btn.dataset.metric;
+      if (metric === currentMetric) return;
+      currentMetric = metric;
+      this.querySelectorAll(".chart-toggle-btn").forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle("is-active", active);
+        b.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+      renderYearChart(currentMetric);
+    });
+  }
+
+  renderYearChart(currentMetric);
   renderCategoryChart();
   renderRatingChart();
 })();
