@@ -170,10 +170,6 @@ def render_index(books):
     <h1>Reading</h1>
     <a class="site-nav-link" href="stats.html">Stats</a>
   </div>
-  <nav class="exports">
-    <a href="books.csv" download>CSV</a>
-    <a href="feed.rss">RSS</a>
-  </nav>
 </header>
 <main>
   {controls}
@@ -288,6 +284,12 @@ def render_stats(books):
     <div id="category-chart"></div>
   </div>
 </main>
+<footer class="site-footer">
+  <nav class="exports">
+    <a href="books.csv" download>CSV</a>
+    <a href="feed.rss">RSS</a>
+  </nav>
+</footer>
 <script id="stats-data" type="application/json">{data}</script>
 <script src="stats.js"></script>"""
 
