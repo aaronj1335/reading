@@ -1,0 +1,63 @@
+<header class="site-header">
+  <div class="site-header-row">
+    <h1>Reading Stats</h1>
+    <a class="site-nav-link" href="index.html">All books</a>
+  </div>
+  <p class="count">{year_range}</p>
+</header>
+<main class="stats-page">
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">{finished_count}</div>
+      <div class="stat-lbl">Books finished</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{total_count}</div>
+      <div class="stat-lbl">Total tracked</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{years_count}</div>
+      <div class="stat-lbl">Years tracked</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{median_per_year}</div>
+      <div class="stat-lbl">Median&nbsp;finished / year</div>
+    </div>
+  </div>
+
+  <div class="stats-section">
+    <div class="stats-section-header">
+      <h2 class="stats-section-heading">Books finished per year</h2>
+      {year_chart_toggle}
+    </div>
+    <div id="year-chart-container" class="chart-container"></div>
+  </div>
+
+  <div class="stats-section">
+    <div class="stats-section-header">
+      <h2 class="stats-section-heading" id="year-section-heading">{default_year} in books</h2>
+      <select id="year-select" aria-label="Select year">
+        {year_options}
+      </select>
+    </div>
+    <ul id="year-book-list" class="book-list stats-book-list"></ul>
+  </div>
+
+  <div class="stats-section">
+    <h2 class="stats-section-heading">By category</h2>
+    <div id="category-chart"></div>
+  </div>
+
+  <div class="stats-section">
+    <h2 class="stats-section-heading">By rating</h2>
+    <div id="rating-chart" class="chart-container"></div>
+  </div>
+</main>
+<footer class="site-footer">
+  <nav class="exports">
+    <a href="books.csv" download>CSV</a>
+    <a href="feed.rss">RSS</a>
+  </nav>
+</footer>
+<script id="stats-data" type="application/json">{data}</script>
+<script src="stats.js"></script>

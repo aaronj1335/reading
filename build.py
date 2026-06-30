@@ -13,7 +13,9 @@ parses them and renders:
   _site/style.css         copied from static/
   _site/.nojekyll         so GitHub Pages serves files verbatim
 
-No template engine: pages are assembled with plain Python string helpers.
+The page markup lives in templates/*.template.html. Each template is a plain
+string with `{name}` placeholders filled in via str.format — no template engine
+is required.
 """
 import colorsys
 import csv
@@ -26,6 +28,7 @@ import shutil
 import textwrap
 from collections import defaultdict
 from datetime import date as _date
+from functools import lru_cache
 from statistics import median
 from pathlib import Path
 
@@ -35,7 +38,14 @@ import yaml
 ROOT = Path(__file__).parent
 BOOKS_DIR = ROOT / "books"
 STATIC_DIR = ROOT / "static"
+TEMPLATES_DIR = ROOT / "templates"
 SITE_DIR = ROOT / "_site"
+
+
+@lru_cache(maxsize=None)
+def template(name):
+    """Load templates/<name>, cached for the life of the build."""
+    return (TEMPLATES_DIR / name).read_text(encoding="utf-8")
 
 NORMALIZE_CDN = "https://cdn.jsdelivr.net/npm/modern-normalize@3.0.1/modern-normalize.min.css"
 
@@ -110,21 +120,13 @@ def e(s):
 def page(title, head_extra, body, depth):
     """Wrap body in the shared HTML shell. `depth` = path depth below site root."""
     prefix = "../" * depth
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
-<title>{e(title)}</title>
-<link rel="stylesheet" href="{NORMALIZE_CDN}">
-<link rel="stylesheet" href="{prefix}style.css">
-{head_extra}
-</head>
-<body>
-{body}
-</body>
-</html>
-"""
+    return template("page.template.html").format(
+        title=e(title),
+        normalize_cdn=NORMALIZE_CDN,
+        prefix=prefix,
+        head_extra=head_extra,
+        body=body,
+    )
 
 
 def stars_display(n):
@@ -140,45 +142,8 @@ def render_index(books):
     tags = sorted({t for b in books for t in b["tags"]})
     tag_options = "".join(f'<option value="{e(t)}">{e(t)}</option>' for t in tags)
 
-    controls = f"""<div class="controls" id="controls">
-  <input type="search" id="search" placeholder="Search title, author, tag…" autocomplete="off" aria-label="Search">
-  <div class="filters">
-    <select id="category" aria-label="Category">
-      <option value="">All</option>
-      <option value="fiction">Fiction</option>
-      <option value="nonfiction">Nonfiction</option>
-    </select>
-    <select id="tag" aria-label="Tag">
-      <option value="">All tags</option>
-      {tag_options}
-    </select>
-    <select id="exclude-tag" aria-label="Exclude tag">
-      <option value="">Exclude none</option>
-      {tag_options}
-    </select>
-    <select id="sort" aria-label="Sort by">
-      <option value="finished">Recently finished</option>
-      <option value="started">Recently started</option>
-      <option value="title">Title</option>
-      <option value="author">Author</option>
-      <option value="stars">Rating</option>
-    </select>
-  </div>
-</div>"""
-
-    body = f"""<header class="site-header">
-  <div class="site-header-row">
-    <h1>Reading</h1>
-    <a class="site-nav-link" href="stats.html">Stats</a>
-  </div>
-</header>
-<main>
-  {controls}
-  <ul id="list" class="book-list"></ul>
-  <p id="empty" class="empty" hidden>No books match.</p>
-</main>
-<script id="books-data" type="application/json">{data}</script>
-<script src="index.js"></script>"""
+    controls = template("controls.template.html").format(tag_options=tag_options)
+    body = template("index.template.html").format(controls=controls, data=data)
     return page("Reading", "", body, depth=0)
 
 
@@ -254,77 +219,20 @@ def render_stats(books):
     # finished book carries a page count (otherwise "Pages" would be all zero).
     has_year_pages = any(d["pages"] for d in by_year_data)
     year_chart_toggle = (
-        """<div class="chart-toggle" id="year-chart-toggle" role="group" aria-label="Chart metric">
-        <button type="button" class="chart-toggle-btn is-active" data-metric="count" aria-pressed="true">Books</button>
-        <button type="button" class="chart-toggle-btn" data-metric="pages" aria-pressed="false">Pages</button>
-      </div>"""
-        if has_year_pages
-        else ""
+        template("year-chart-toggle.template.html") if has_year_pages else ""
     )
 
-    body = f"""<header class="site-header">
-  <div class="site-header-row">
-    <h1>Reading Stats</h1>
-    <a class="site-nav-link" href="index.html">All books</a>
-  </div>
-  <p class="count">{e(year_range)}</p>
-</header>
-<main class="stats-page">
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-num">{len(finished)}</div>
-      <div class="stat-lbl">Books finished</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">{len(books)}</div>
-      <div class="stat-lbl">Total tracked</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">{len(years)}</div>
-      <div class="stat-lbl">Years tracked</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">{median_per_year}</div>
-      <div class="stat-lbl">Median&nbsp;finished / year</div>
-    </div>
-  </div>
-
-  <div class="stats-section">
-    <div class="stats-section-header">
-      <h2 class="stats-section-heading">Books finished per year</h2>
-      {year_chart_toggle}
-    </div>
-    <div id="year-chart-container" class="chart-container"></div>
-  </div>
-
-  <div class="stats-section">
-    <div class="stats-section-header">
-      <h2 class="stats-section-heading" id="year-section-heading">{e(default_year)} in books</h2>
-      <select id="year-select" aria-label="Select year">
-        {year_options}
-      </select>
-    </div>
-    <ul id="year-book-list" class="book-list stats-book-list"></ul>
-  </div>
-
-  <div class="stats-section">
-    <h2 class="stats-section-heading">By category</h2>
-    <div id="category-chart"></div>
-  </div>
-
-  <div class="stats-section">
-    <h2 class="stats-section-heading">By rating</h2>
-    <div id="rating-chart" class="chart-container"></div>
-  </div>
-</main>
-<footer class="site-footer">
-  <nav class="exports">
-    <a href="books.csv" download>CSV</a>
-    <a href="feed.rss">RSS</a>
-  </nav>
-</footer>
-<script id="stats-data" type="application/json">{data}</script>
-<script src="stats.js"></script>"""
+    body = template("stats.template.html").format(
+        year_range=e(year_range),
+        finished_count=len(finished),
+        total_count=len(books),
+        years_count=len(years),
+        median_per_year=median_per_year,
+        year_chart_toggle=year_chart_toggle,
+        default_year=e(default_year),
+        year_options=year_options,
+        data=data,
+    )
 
     return page("Reading Stats", "", body, depth=0)
 
@@ -354,18 +262,14 @@ def render_book(book):
     onerror = (
         f" onerror=\"this.onerror=null;this.src='{fallback}'\"" if book["cover"] else ""
     )
-    body = f"""<article class="book-page">
-  <p><a class="back" href="../index.html">← All books</a></p>
-  <div class="book-header">
-    <img class="book-cover" src="{cover_src}"{onerror} alt="" width="300" height="450">
-    <div class="book-header-text">
-      <h1>{e(book["title"])}</h1>
-      <p class="author">{e(book["author"])}</p>
-      <div class="meta">{meta_html}</div>
-    </div>
-  </div>
-  {body_html}
-</article>"""
+    body = template("book.template.html").format(
+        cover_src=cover_src,
+        onerror=onerror,
+        title=e(book["title"]),
+        author=e(book["author"]),
+        meta_html=meta_html,
+        body_html=body_html,
+    )
     return page(book["title"], "", body, depth=1)
 
 
