@@ -2,6 +2,7 @@
 title: Prince Caspian
 author: C.S. Lewis
 isbn: 9780064405003
+pages: 223
 finished: 2020-09-01
 started: 2020-08-02
 stars: 4
