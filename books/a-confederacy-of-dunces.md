@@ -4,6 +4,6 @@ author: John Kennedy Toole
 isbn: 9780140058895
 finished: 2023-05-09
 started: 2022-09-25
-stars: 2
+stars: 1
 category: fiction
 ---

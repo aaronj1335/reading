@@ -220,12 +220,17 @@ def render_stats(books):
     avg_per_year = round(len(finished) / len(years), 1) if years else 0
     default_year = str(years[-1]) if years else ""
 
+    # Rating distribution: how many books carry each 1–5 star rating
+    # (unrated books, stars == 0, are excluded).
+    by_rating = {n: sum(1 for b in books if b["stars"] == n) for n in range(1, 6)}
+
     stats_data = {
         "total": len(books),
         "finished": len(finished),
         "avg_per_year": avg_per_year,
         "by_year": by_year_data,
         "by_category": {"fiction": fiction_count, "nonfiction": nonfiction_count},
+        "by_rating": by_rating,
         "pages": {"total": pages_total, "fiction": pages_fiction, "nonfiction": pages_nonfiction},
         "books_by_year": books_by_year,
     }
@@ -282,6 +287,11 @@ def render_stats(books):
   <div class="stats-section">
     <h2 class="stats-section-heading">By category</h2>
     <div id="category-chart"></div>
+  </div>
+
+  <div class="stats-section">
+    <h2 class="stats-section-heading">By rating</h2>
+    <div id="rating-chart" class="chart-container"></div>
   </div>
 </main>
 <footer class="site-footer">

@@ -4,6 +4,6 @@ author: Sam Ardery
 isbn: 9781736294918
 finished:
 started: 2021-04-30
-stars: 3
+stars: 2
 category: nonfiction
 ---

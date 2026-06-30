@@ -4,6 +4,6 @@ author: Zora Neale Hurston
 isbn: 9780061120060
 finished: 2021-06-07
 started: 2019-10-09
-stars: 4
+stars: 3
 category: fiction
 ---

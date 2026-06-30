@@ -4,7 +4,7 @@ author: Sarah Wynn-Williams
 isbn: 9781250391230
 finished: 2025-08-04
 started: 2025-07-26
-stars: 4
+stars: 3
 category: nonfiction
 ---
 

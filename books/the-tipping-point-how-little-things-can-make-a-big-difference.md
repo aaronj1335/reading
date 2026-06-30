@@ -4,6 +4,6 @@ author: Malcolm Gladwell
 isbn: 9780316346627
 finished: 2010-06-05
 started: 2010-05-29
-stars: 3
+stars: 2
 category: nonfiction
 ---

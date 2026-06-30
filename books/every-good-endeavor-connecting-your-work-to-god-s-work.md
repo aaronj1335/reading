@@ -4,7 +4,7 @@ author: Timothy J. Keller
 isbn: 9781101600337
 finished: 2021-12-02
 started: 2020-11-16
-stars: 4
+stars: 3
 category: nonfiction
 ---
 

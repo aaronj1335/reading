@@ -4,6 +4,6 @@ author: Erik Larson
 isbn: 9780375708275
 finished: 2021-12-11
 started: 2021-11-26
-stars: 4
+stars: 3
 category: nonfiction
 ---

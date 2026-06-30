@@ -4,6 +4,6 @@ author: Christopher Moore
 isbn: 9780380813810
 finished:
 started: 2017-08-24
-stars: 3
+stars: 2
 category: fiction
 ---

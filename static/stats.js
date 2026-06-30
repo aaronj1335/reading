@@ -212,6 +212,34 @@
     }
   }
 
+  // ── Rating distribution bar chart ─────────────────────────────────────────
+
+  function renderRatingChart() {
+    const container = document.getElementById("rating-chart");
+    if (!container || !data.by_rating) return;
+
+    // Vertical columns, lowest rating to highest (1 → 5).
+    const cols = [1, 2, 3, 4, 5].map((n) => ({
+      stars: n,
+      count: data.by_rating[n] || 0,
+    }));
+    const maxCount = Math.max(1, ...cols.map((c) => c.count));
+
+    container.innerHTML = cols
+      .map(({ stars, count }) => {
+        const pct = ((count / maxCount) * 100).toFixed(0);
+        return (
+          `<div class="rating-col" role="meter" aria-valuenow="${count}" aria-valuemax="${maxCount}" ` +
+          `aria-label="${stars} star${stars !== 1 ? "s" : ""}: ${count} book${count !== 1 ? "s" : ""}">` +
+          `<span class="rating-col-count">${count}</span>` +
+          `<div class="rating-col-bar" style="height:${pct}%"></div>` +
+          `<span class="rating-col-label" aria-hidden="true">${stars}★</span>` +
+          `</div>`
+        );
+      })
+      .join("");
+  }
+
   // ── Wire up year selector ─────────────────────────────────────────────────
 
   const yearSelect = document.getElementById("year-select");
@@ -226,4 +254,5 @@
 
   renderYearChart();
   renderCategoryChart();
+  renderRatingChart();
 })();

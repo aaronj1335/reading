@@ -4,6 +4,6 @@ author: Javier Blas
 isbn: 9781847942661
 finished: 2026-06-04
 started: 2026-05-13
-stars: 4
+stars: 3
 category: nonfiction
 ---
