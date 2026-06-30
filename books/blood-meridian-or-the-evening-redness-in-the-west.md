@@ -4,7 +4,7 @@ author: Cormac McCarthy
 isbn: 9780679728757
 finished: 2020-12-11
 started: 2019-10-09
-stars: 4
+stars: 3
 category: fiction
 ---
 

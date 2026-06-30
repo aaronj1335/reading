@@ -212,6 +212,36 @@
     }
   }
 
+  // ── Rating distribution bar chart ─────────────────────────────────────────
+
+  function renderRatingChart() {
+    const container = document.getElementById("rating-chart");
+    if (!container || !data.by_rating) return;
+
+    // Highest star ratings on top (5 → 1).
+    const rows = [5, 4, 3, 2, 1].map((n) => ({
+      stars: n,
+      count: data.by_rating[n] || 0,
+    }));
+    const maxCount = Math.max(1, ...rows.map((r) => r.count));
+
+    container.innerHTML = rows
+      .map(({ stars, count }) => {
+        const pct = ((count / maxCount) * 100).toFixed(0);
+        const label = starsDisplay(stars);
+        return (
+          `<div class="rating-bar-row">` +
+          `<span class="rating-bar-label" aria-hidden="true">${label}</span>` +
+          `<div class="rating-bar-track" role="meter" aria-valuenow="${count}" aria-valuemax="${maxCount}" aria-label="${stars} star${stars !== 1 ? "s" : ""}: ${count} book${count !== 1 ? "s" : ""}">` +
+          `<div class="rating-bar-fill" style="width:${pct}%"></div>` +
+          `</div>` +
+          `<span class="rating-bar-count">${count}</span>` +
+          `</div>`
+        );
+      })
+      .join("");
+  }
+
   // ── Wire up year selector ─────────────────────────────────────────────────
 
   const yearSelect = document.getElementById("year-select");
@@ -226,4 +256,5 @@
 
   renderYearChart();
   renderCategoryChart();
+  renderRatingChart();
 })();

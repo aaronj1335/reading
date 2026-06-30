@@ -4,6 +4,6 @@ author: Robert M. Pirsig
 isbn: 9780060589462
 finished:
 started: 2009-07-27
-stars: 3
+stars: 2
 category: nonfiction
 ---

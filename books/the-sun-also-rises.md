@@ -4,6 +4,6 @@ author: Ernest Hemingway
 isbn: 9780743297332
 finished: 2021-01-23
 started: 2020-12-02
-stars: 4
+stars: 3
 category: fiction
 ---

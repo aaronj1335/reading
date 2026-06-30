@@ -4,6 +4,6 @@ author: Yasunari Kawabata
 isbn: 9780679761044
 finished: 2022-12-14
 started: 2022-09-25
-stars: 4
+stars: 3
 category: fiction
 ---
