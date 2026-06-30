@@ -343,14 +343,15 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
     box-shadow: none;
     border-top: none;
     border-bottom: 1px solid var(--border);
-    flex-direction: row;
-    align-items: center;
+    /* keep the search bar on its own row with the filters below it so the
+       selects have room to breathe instead of overflowing the container */
+    flex-direction: column;
     padding: 0.75rem 1rem;
     max-width: var(--maxw);
     margin: 1rem auto 0;
     border-radius: var(--radius);
     border: 1px solid var(--border);
   }
-  .controls input { flex: 1; }
-  .filters { flex: 0 0 auto; }
+  /* let each filter share the row evenly */
+  .filters select { flex: 1 1 0; }
 }
