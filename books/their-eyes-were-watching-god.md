@@ -5,6 +5,6 @@ isbn: 9780061120060
 pages: 223
 finished: 2021-06-07
 started: 2019-10-09
-stars: 3
+stars: 4
 category: fiction
 ---

@@ -5,7 +5,7 @@ isbn: 9781607108504
 pages: 585
 finished: 2022-12-27
 started: 2022-04-12
-stars: 3
+stars: 4
 category: fiction
 ---
 
