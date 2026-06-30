@@ -218,24 +218,22 @@
     const container = document.getElementById("rating-chart");
     if (!container || !data.by_rating) return;
 
-    // Highest star ratings on top (5 → 1).
-    const rows = [5, 4, 3, 2, 1].map((n) => ({
+    // Vertical columns, lowest rating to highest (1 → 5).
+    const cols = [1, 2, 3, 4, 5].map((n) => ({
       stars: n,
       count: data.by_rating[n] || 0,
     }));
-    const maxCount = Math.max(1, ...rows.map((r) => r.count));
+    const maxCount = Math.max(1, ...cols.map((c) => c.count));
 
-    container.innerHTML = rows
+    container.innerHTML = cols
       .map(({ stars, count }) => {
         const pct = ((count / maxCount) * 100).toFixed(0);
-        const label = starsDisplay(stars);
         return (
-          `<div class="rating-bar-row">` +
-          `<span class="rating-bar-label" aria-hidden="true">${label}</span>` +
-          `<div class="rating-bar-track" role="meter" aria-valuenow="${count}" aria-valuemax="${maxCount}" aria-label="${stars} star${stars !== 1 ? "s" : ""}: ${count} book${count !== 1 ? "s" : ""}">` +
-          `<div class="rating-bar-fill" style="width:${pct}%"></div>` +
-          `</div>` +
-          `<span class="rating-bar-count">${count}</span>` +
+          `<div class="rating-col" role="meter" aria-valuenow="${count}" aria-valuemax="${maxCount}" ` +
+          `aria-label="${stars} star${stars !== 1 ? "s" : ""}: ${count} book${count !== 1 ? "s" : ""}">` +
+          `<span class="rating-col-count">${count}</span>` +
+          `<div class="rating-col-bar" style="height:${pct}%"></div>` +
+          `<span class="rating-col-label" aria-hidden="true">${stars}★</span>` +
           `</div>`
         );
       })

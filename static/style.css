@@ -296,36 +296,38 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
 }
 .cat-total { margin: 0.4rem 0 0; font-size: 0.85rem; color: var(--muted); }
 
-/* Rating distribution bar chart */
-.rating-bar-row {
+/* Rating distribution column chart */
+#rating-chart {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.65rem;
-  font-size: 0.9rem;
+  align-items: flex-end;
+  gap: 1.25rem;
+  height: 180px;
+  padding-top: 0.5rem;
 }
-.rating-bar-label {
-  width: 6.5rem;
-  flex-shrink: 0;
+.rating-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 0.4rem;
+}
+.rating-col-bar {
+  width: 100%;
+  max-width: 3.5rem;
+  background: #e0a106;
+  border-radius: 6px 6px 0 0;
+  transition: height 0.4s ease;
+  min-height: 2px;
+}
+.rating-col-count { font-size: 0.85rem; color: var(--muted); }
+.rating-col-label {
   color: #e0a106;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   letter-spacing: 0.05em;
   white-space: nowrap;
 }
-.rating-bar-track {
-  flex: 1;
-  height: 14px;
-  background: var(--border);
-  border-radius: 999px;
-  overflow: hidden;
-}
-.rating-bar-fill {
-  height: 100%;
-  background: #e0a106;
-  border-radius: 999px;
-  transition: width 0.4s ease;
-}
-.rating-bar-count { width: 2.5rem; text-align: right; color: var(--muted); font-size: 0.85rem; }
 
 .stats-book-list { margin-top: 0; }
 
