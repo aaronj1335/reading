@@ -2,6 +2,7 @@
 title: Charlotte’s Web
 author: E.B. White
 isbn: 9780064410939
+pages: 184
 finished: 2023-07-28
 started: 2023-05-28
 stars: 5

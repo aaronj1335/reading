@@ -316,6 +316,8 @@ def render_book(book):
         meta_rows.append(("Started", book["started"]))
     if book["category"]:
         meta_rows.append(("Category", book["category"]))
+    if book["pages"]:
+        meta_rows.append(("Pages", str(book["pages"])))
     if book["tags"]:
         meta_rows.append(("Tags", ", ".join(book["tags"])))
     meta_html = "".join(
@@ -403,7 +405,7 @@ def render_csv(books):
     """Generate a CSV export of all books."""
     out = io.StringIO()
     writer = csv.writer(out)
-    writer.writerow(["title", "author", "finished", "started", "category", "tags", "stars"])
+    writer.writerow(["title", "author", "finished", "started", "category", "tags", "stars", "pages"])
     for book in books:
         writer.writerow([
             book["title"],
@@ -413,6 +415,7 @@ def render_csv(books):
             book["category"],
             ", ".join(book["tags"]),
             book["stars"] or "",
+            book["pages"] or "",
         ])
     return out.getvalue()
 
