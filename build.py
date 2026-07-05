@@ -8,6 +8,7 @@ parses them and renders:
   _site/index.html        searchable / filterable / sortable list
   _site/stats.html        reading statistics page
   _site/books/<slug>.html one page per book
+  _site/reading.epub      EPUB 3 export for publish-on-demand services
   _site/index.js          copied from static/
   _site/stats.js          copied from static/
   _site/style.css         copied from static/
@@ -26,6 +27,8 @@ import json
 import re
 import shutil
 import textwrap
+import uuid
+import zipfile
 from collections import defaultdict
 from datetime import date as _date
 from functools import lru_cache
@@ -395,6 +398,127 @@ def render_rss(books):
     )
 
 
+POEM_MARKER = "<br"  # Markdown hard line breaks render as <br />; only verse has them.
+
+
+def poemify(body_html):
+    """Mark up poems in a book body for the EPUB stylesheet to center.
+
+    A poem is any verse block — a blockquote or paragraph whose Markdown
+    source uses hard line breaks (trailing double spaces), which the Markdown
+    renderer turns into <br />. Prose never produces those, so their presence
+    identifies verse. Each poem's content is wrapped in a .poem-inner element
+    so CSS can center the block on its longest line while keeping the lines
+    themselves left-aligned relative to each other.
+    """
+
+    def quote_repl(m):
+        inner = m.group(1)
+        if POEM_MARKER not in inner:
+            return m.group(0)
+        return f'<blockquote class="poem"><div class="poem-inner">{inner}</div></blockquote>'
+
+    def para_repl(m):
+        if POEM_MARKER not in m.group(1):
+            return m.group(0)
+        return f'<div class="poem"><p class="poem-inner">{m.group(1)}</p></div>'
+
+    out = re.sub(r"<blockquote>(.*?)</blockquote>", quote_repl, body_html, flags=re.DOTALL)
+    # Bare verse paragraphs (outside any blockquote) get the same treatment.
+    # Splitting keeps the paragraph pass away from blockquote contents.
+    parts = re.split(r"(<blockquote.*?</blockquote>)", out, flags=re.DOTALL)
+    return "".join(
+        part if part.startswith("<blockquote")
+        else re.sub(r"<p>(.*?)</p>", para_repl, part, flags=re.DOTALL)
+        for part in parts
+    )
+
+
+def write_epub(books, path):
+    """Package every book into a single EPUB 3 file at `path`.
+
+    EPUB is the upload format publish-on-demand services (Lulu, KDP, Blurb, …)
+    accept, so `_site/reading.epub` can be sent to one as-is. Built with only
+    the standard library: an EPUB is a zip whose first entry is an uncompressed
+    `mimetype` file, plus a container pointer, an OPF manifest/spine, a nav
+    document, and one XHTML chapter per book. Identifier and modified date are
+    derived from the content so identical inputs build identical books.
+    """
+    creator = "Aaron Stacy"
+    pub_uuid = uuid.uuid5(uuid.NAMESPACE_URL, "https://aaronstacy.com/reading")
+    dates = sorted(b["sort_date"] for b in books if b["sort_date"])
+    modified = f"{dates[-1] if dates else '2000-01-01'}T00:00:00Z"
+    year_range = f"{dates[0][:4]}–{dates[-1][:4]}" if dates else ""
+
+    chapters = []  # (id, filename, title, xhtml)
+    for i, book in enumerate(books):
+        meta_parts = []
+        if book["stars"]:
+            meta_parts.append(stars_display(book["stars"]))
+        if book["finished"]:
+            meta_parts.append(f"Finished {book['finished']}")
+        if book["started"]:
+            meta_parts.append(f"Started {book['started']}")
+        if book["category"]:
+            meta_parts.append(book["category"])
+        if book["pages"]:
+            meta_parts.append(f"{book['pages']} pages")
+        meta_html = (
+            f'<p class="meta">{e(" · ".join(meta_parts))}</p>' if meta_parts else ""
+        )
+        xhtml = template("epub-chapter.template.xhtml").format(
+            title=e(book["title"]),
+            author=e(book["author"]),
+            meta_html=meta_html,
+            body_html=poemify(book["body_html"]),
+        )
+        chapters.append((f"b{i:03d}", f"{book['slug']}.xhtml", book["title"], xhtml))
+
+    manifest_items = "\n".join(
+        f'    <item id="{cid}" href="{e(fname)}" media-type="application/xhtml+xml"/>'
+        for cid, fname, _, _ in chapters
+    )
+    spine_items = "\n".join(
+        f'    <itemref idref="{cid}"/>' for cid, _, _, _ in chapters
+    )
+    toc_items = "\n".join(
+        f'      <li><a href="{e(fname)}">{e(title)}</a></li>'
+        for _, fname, title, _ in chapters
+    )
+
+    opf = template("epub-content.template.opf").format(
+        uuid=pub_uuid,
+        creator=e(creator),
+        modified=modified,
+        manifest_items=manifest_items,
+        spine_items=spine_items,
+    )
+    nav = template("epub-nav.template.xhtml").format(toc_items=toc_items)
+    title_page = template("epub-title.template.xhtml").format(
+        book_count=len(books), year_range=e(year_range)
+    )
+    cover = cover_svg({"slug": "reading", "title": "Reading", "author": creator})
+
+    with zipfile.ZipFile(path, "w") as zf:
+        # The EPUB spec requires `mimetype` first and uncompressed.
+        zf.writestr(
+            zipfile.ZipInfo("mimetype"),
+            "application/epub+zip",
+            compress_type=zipfile.ZIP_STORED,
+        )
+        entries = [
+            ("META-INF/container.xml", template("epub-container.template.xml")),
+            ("OEBPS/content.opf", opf),
+            ("OEBPS/nav.xhtml", nav),
+            ("OEBPS/style.css", (STATIC_DIR / "epub.css").read_text(encoding="utf-8")),
+            ("OEBPS/cover.svg", cover),
+            ("OEBPS/title.xhtml", title_page),
+        ]
+        entries += [(f"OEBPS/{fname}", xhtml) for _, fname, _, xhtml in chapters]
+        for name, content in entries:
+            zf.writestr(name, content, compress_type=zipfile.ZIP_DEFLATED)
+
+
 def main():
     if SITE_DIR.exists():
         shutil.rmtree(SITE_DIR)
@@ -417,6 +541,7 @@ def main():
 
     (SITE_DIR / "books.csv").write_text(render_csv(books), encoding="utf-8")
     (SITE_DIR / "feed.rss").write_text(render_rss(books), encoding="utf-8")
+    write_epub(books, SITE_DIR / "reading.epub")
 
     for asset in ("index.js", "stats.js", "style.css"):
         shutil.copy(STATIC_DIR / asset, SITE_DIR / asset)

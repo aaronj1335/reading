@@ -1,0 +1,60 @@
+/* Stylesheet embedded in _site/reading.epub (the publish-on-demand export).
+   Kept out of templates/ because template() runs str.format over its input,
+   which would choke on CSS braces. */
+
+body {
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.5;
+}
+
+/* Each book starts on a fresh page when the EPUB is converted for print. */
+section.book {
+  page-break-before: always;
+  break-before: page;
+}
+
+.title-page {
+  text-align: center;
+  margin-top: 30%;
+}
+
+.title-page h1 {
+  font-size: 2.2em;
+}
+
+.tagline {
+  font-style: italic;
+}
+
+h1 {
+  font-size: 1.5em;
+  margin-bottom: 0.2em;
+}
+
+.author {
+  font-style: italic;
+  margin-top: 0;
+}
+
+.meta {
+  font-size: 0.85em;
+  color: #555;
+}
+
+blockquote {
+  margin: 1em 1.5em;
+  font-style: italic;
+}
+
+/* Poems (verse blocks written with Markdown hard line breaks) are centered
+   the way poetry is conventionally typeset: the poem as a whole is centered
+   on its longest line, while the lines themselves stay left-aligned relative
+   to each other so indentation and ragged-right line lengths are preserved. */
+.poem {
+  text-align: center;
+}
+
+.poem .poem-inner {
+  display: inline-block;
+  text-align: left;
+}

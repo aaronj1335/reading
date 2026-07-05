@@ -26,6 +26,29 @@ tags: []                  # Leave out if empty, otherwise something like [read-w
 Optional notes in Markdown go here; they render on the book's page.
 ```
 
+### Poems
+
+Write any verse in your notes with Markdown hard line breaks — end each line
+with two trailing spaces — either inside a `>` quote block or as a bare
+stanza:
+
+```markdown
+> Two roads diverged in a yellow wood,··
+> And sorry I could not travel both··
+```
+
+(`··` = two trailing spaces.) In the publish-on-demand export these blocks
+are typeset as poetry: the poem is centered on its longest line, with the
+lines left-aligned relative to each other.
+
+## Publish-on-demand export
+
+The build writes `_site/reading.epub`, an EPUB 3 with a cover, title page,
+table of contents, and one chapter per book. It validates clean under
+[EPUBCheck](https://www.w3.org/publishing/epubcheck/) and can be uploaded
+as-is to publish-on-demand services such as Lulu, Kindle Direct Publishing,
+or Blurb.
+
 ## Build locally
 
 Requires [uv](https://docs.astral.sh/uv/):
