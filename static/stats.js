@@ -271,8 +271,11 @@
         return (
           `<div class="rating-col" role="meter" aria-valuenow="${count}" aria-valuemax="${maxCount}" ` +
           `aria-label="${stars} star${stars !== 1 ? "s" : ""}: ${count} book${count !== 1 ? "s" : ""}">` +
+          `<div class="rating-col-track">` +
+          `<div class="rating-col-bar" style="height:${pct}%">` +
           `<span class="rating-col-count">${count}</span>` +
-          `<div class="rating-col-bar" style="height:${pct}%"></div>` +
+          `</div>` +
+          `</div>` +
           `<span class="rating-col-label" aria-hidden="true">${stars}★</span>` +
           `</div>`
         );
