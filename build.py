@@ -52,6 +52,9 @@ def template(name):
 
 NORMALIZE_CDN = "https://cdn.jsdelivr.net/npm/modern-normalize@3.0.1/modern-normalize.min.css"
 
+# Base URL for the "Edit this page" link on book detail pages.
+EDIT_URL_BASE = "https://github.com/aaronj1335/reading/edit/main/books/"
+
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.DOTALL)
 
 
@@ -284,6 +287,7 @@ def render_book(book):
         author=e(book["author"]),
         meta_html=meta_html,
         body_html=body_html,
+        edit_url=e(f"{EDIT_URL_BASE}{book['slug']}.md"),
     )
     return page(book["title"], "", body, depth=1)
 
