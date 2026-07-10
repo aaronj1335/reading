@@ -6,5 +6,5 @@ pages: 1095
 finished: 2025-12-29
 started: 2022-04-12
 stars: 4
-category: fiction
+tags: [fiction]
 ---

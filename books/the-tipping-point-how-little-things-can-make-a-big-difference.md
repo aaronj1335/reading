@@ -6,5 +6,5 @@ pages: 301
 finished: 2010-06-05
 started: 2010-05-29
 stars: 2
-category: nonfiction
+tags: [nonfiction]
 ---

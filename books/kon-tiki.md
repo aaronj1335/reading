@@ -6,5 +6,5 @@ pages: 240
 finished: 1997-01-01
 started: 1997-01-01
 stars: 4
-category: nonfiction
+tags: [nonfiction]
 ---

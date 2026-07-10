@@ -6,7 +6,7 @@ pages: 247
 finished: 2017-10-07
 started: 2017-08-24
 stars: 5
-category: fiction
+tags: [fiction]
 ---
 
 One of my top 2 or 3 books. Just loved it.

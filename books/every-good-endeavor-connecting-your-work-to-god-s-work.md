@@ -6,7 +6,7 @@ pages: 286
 finished: 2021-12-02
 started: 2020-11-16
 stars: 3
-category: nonfiction
+tags: [nonfiction]
 ---
 
 I found the concept of "the ministry of competence" incredibly validating.

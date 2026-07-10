@@ -6,6 +6,5 @@ pages: 272
 finished: 2022-07-15
 started: 2022-06-02
 stars:
-category: fiction
-tags: [read-with-kids]
+tags: [fiction, read-with-kids]
 ---

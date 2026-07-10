@@ -6,7 +6,7 @@ pages: 601
 finished: 2021-12-29
 started: 2021-07-21
 stars: 5
-category: fiction
+tags: [fiction]
 ---
 
 The first thing that struck me was how well written the characters are, and they only get better from there.

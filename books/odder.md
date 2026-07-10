@@ -6,6 +6,5 @@ pages: 274
 finished: 2024-05-17
 started: 2024-03-26
 stars: 4
-category: fiction
-tags: [read-with-kids]
+tags: [fiction, read-with-kids]
 ---

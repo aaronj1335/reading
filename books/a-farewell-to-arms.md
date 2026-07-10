@@ -6,7 +6,7 @@ pages: 304
 finished: 2017-08-24
 started: 2017-06-14
 stars: 3
-category: fiction
+tags: [fiction]
 ---
 
 Without trying to give away spoilers, given what was going on in my life at this point, the timing of when I read this was bad, but it was a great book.

@@ -6,8 +6,7 @@ pages: 245
 finished:
 started: 2023-10-29
 stars: 2
-category: fiction
-tags: [read-with-kids]
+tags: [fiction, read-with-kids]
 ---
 
 Yikes this is just sadness upon sadness.

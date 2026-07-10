@@ -6,5 +6,5 @@ pages: 239
 finished: 2021-07-21
 started: 2021-02-25
 stars: 3
-category: fiction
+tags: [fiction]
 ---

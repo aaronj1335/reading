@@ -6,5 +6,5 @@ pages: 444
 finished:
 started: 2017-08-24
 stars: 2
-category: fiction
+tags: [fiction]
 ---

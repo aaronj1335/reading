@@ -6,7 +6,7 @@ pages: 370
 finished: 2020-12-11
 started: 2019-10-09
 stars: 4
-category: fiction
+tags: [fiction]
 ---
 
 I guess the Judge is frequently viewed as the devil, but I kinda see him as war. Maybe most specifically smaller scale wars driven by war profiteering.

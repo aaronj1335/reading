@@ -6,7 +6,7 @@ pages: 371
 finished: 2020-03-13
 started: 2019-12-22
 stars: 5
-category: nonfiction
+tags: [nonfiction]
 ---
 
 I think the account of Cynthia Ann Parker's capture and then attempted re-assimilation into white culture is maybe the closest thing we've got to the idea of time traveling back to an ancient culture.

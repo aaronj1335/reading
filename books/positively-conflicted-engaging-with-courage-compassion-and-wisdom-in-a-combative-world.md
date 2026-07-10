@@ -6,5 +6,5 @@ pages: 234
 finished:
 started: 2021-04-30
 stars: 2
-category: nonfiction
+tags: [nonfiction]
 ---

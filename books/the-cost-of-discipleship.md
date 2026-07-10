@@ -6,5 +6,5 @@ pages: 322
 finished:
 started: 2018-04-01
 stars: 2
-category: nonfiction
+tags: [nonfiction]
 ---

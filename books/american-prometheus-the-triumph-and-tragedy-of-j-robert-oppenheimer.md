@@ -6,7 +6,7 @@ pages: 721
 finished: 2025-02-21
 started: 2024-12-30
 stars: 4
-category: nonfiction
+tags: [nonfiction]
 ---
 
 Some idealistic Berkley socialists messed around and ended up giving capitalism the most devastating weapon in history.

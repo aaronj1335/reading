@@ -6,5 +6,5 @@ pages: 385
 finished: 2026-03-08
 started: 2026-01-06
 stars: 5
-category: nonfiction
+tags: [nonfiction]
 ---

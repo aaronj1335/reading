@@ -6,8 +6,7 @@ pages: 184
 finished: 2023-07-28
 started: 2023-05-28
 stars: 5
-category: fiction
-tags: [read-with-kids]
+tags: [fiction, read-with-kids]
 ---
 
 Among my favorite kids books. The picture of true, deep friendship really strikes me. Probably more so because of the unlikely nature of it. Where Winnie the Pooh presents a beautiful picture of community, even with difficult / flawed friends, I think this book zeroes in on the relationships that matter most to us.

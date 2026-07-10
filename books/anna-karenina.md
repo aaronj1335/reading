@@ -6,7 +6,7 @@ pages: 585
 finished: 2022-12-27
 started: 2022-04-12
 stars: 4
-category: fiction
+tags: [fiction]
 ---
 
 I struggled to find Anna Karenina's character as compelling as she probably should be.

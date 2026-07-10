@@ -6,7 +6,7 @@ pages: 1088
 finished: 2026-06-23
 started: 2024-06-28
 stars: 2
-category: fiction
+tags: [fiction]
 ---
 
 Ambitious book. Really enjoyed a lot of it, like the descriptions of the historical events (Civil War, labor protests, political discussions between community members, etc), the characters like Susan Drake, Flash Perkins, and the Perfessor.
