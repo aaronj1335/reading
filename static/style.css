@@ -66,7 +66,8 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
 }
 
 .controls input,
-.controls select {
+.controls select,
+.controls .multiselect-btn {
   font-size: 16px; /* avoids iOS zoom-on-focus */
   font-family: inherit;
   color: var(--text);
@@ -78,13 +79,85 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
 }
 
 .controls input:focus,
-.controls select:focus {
+.controls select:focus,
+.controls .multiselect-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
 
 .filters { display: flex; gap: 0.5rem; }
-.filters select { flex: 1; min-width: 0; }
+.filters select, .filters .multiselect { flex: 1; min-width: 0; }
+
+/* ---- Tag multiselect: disclosure button + panel of native checkboxes ---- */
+.multiselect { position: relative; }
+
+.multiselect-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.multiselect-arrow { color: var(--muted); }
+
+.multiselect-menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* at least as wide as its labels so tag names don't wrap; the button can
+     be narrower (three controls share the row on small screens) */
+  min-width: max-content;
+  max-width: 78vw;
+  /* controls dock to the bottom of the screen on mobile, so open upward */
+  bottom: calc(100% + 8px);
+  z-index: 20;
+  margin: 0;
+  padding: 0.35rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.14);
+  max-height: 45vh;
+  overflow-y: auto;
+}
+
+.multiselect-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.6rem;
+  min-height: 44px; /* comfortable tap target */
+  border-radius: calc(var(--radius) - 4px);
+  cursor: pointer;
+}
+.multiselect-option:hover { background: var(--bg); }
+.multiselect-option input {
+  width: 1.15rem;
+  height: 1.15rem;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+.multiselect-option input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Off-screen but still announced by screen readers (fieldset legend). */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
 
 /* ---- Book list ---- */
 .book-list { list-style: none; margin: 1rem 0 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
@@ -383,5 +456,10 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
     border: 1px solid var(--border);
   }
   /* let each filter share the row evenly */
-  .filters select { flex: 1 1 0; }
+  .filters select, .filters .multiselect { flex: 1 1 0; }
+  /* controls sit at the top of the page here, so the menu opens downward */
+  .multiselect-menu {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
 }

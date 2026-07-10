@@ -1,18 +1,17 @@
 <div class="controls" id="controls">
   <input type="search" id="search" placeholder="Search title, author, tag…" autocomplete="off" aria-label="Search">
   <div class="filters">
-    <select id="category" aria-label="Category">
-      <option value="">All</option>
-      <option value="fiction">Fiction</option>
-      <option value="nonfiction">Nonfiction</option>
-    </select>
-    <select id="tag" aria-label="Tag">
-      <option value="">All tags</option>
-      {tag_options}
-    </select>
-    <select id="exclude-tag" aria-label="Exclude tag">
-      <option value="">Exclude none</option>
-      {tag_options}
+    <div class="multiselect">
+      <button type="button" class="multiselect-btn" id="tag-btn" aria-expanded="false" aria-controls="tag-menu"><span id="tag-btn-label">Tags</span><span class="multiselect-arrow" aria-hidden="true">▾</span></button>
+      <fieldset class="multiselect-menu" id="tag-menu" hidden>
+        <legend class="visually-hidden">Filter by tag</legend>
+        {tag_checkboxes}
+      </fieldset>
+    </div>
+    <select id="tag-mode" aria-label="Tag match mode">
+      <option value="any">Any of</option>
+      <option value="all">All of</option>
+      <option value="none">None of</option>
     </select>
     <select id="sort" aria-label="Sort by">
       <option value="finished">Recently finished</option>

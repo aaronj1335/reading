@@ -2,8 +2,8 @@
 """Build the static "personal Goodreads" site from books/*.md into _site/.
 
 Source of truth is one Markdown file per book under books/, each with YAML
-frontmatter (title, author, finished, started, category, tags). This script
-parses them and renders:
+frontmatter (title, author, finished, started, tags). This script parses them
+and renders:
 
   _site/index.html        searchable / filterable / sortable list
   _site/stats.html        reading statistics page
@@ -54,6 +54,10 @@ NORMALIZE_CDN = "https://cdn.jsdelivr.net/npm/modern-normalize@3.0.1/modern-norm
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.DOTALL)
 
+# Every book must carry exactly one of these in its tags (fiction xor
+# nonfiction); load_books() enforces this at build time.
+CATEGORY_TAGS = ("fiction", "nonfiction")
+
 
 def parse_book(path):
     """Parse a book Markdown file into a dict; body rendered to HTML."""
@@ -92,6 +96,8 @@ def parse_book(path):
     except (TypeError, ValueError):
         pages = None
 
+    tags = [str(t).strip() for t in (meta.get("tags") or [])]
+
     return {
         "slug": path.stem,
         "title": title,
@@ -102,15 +108,39 @@ def parse_book(path):
         "stars": as_stars(meta.get("stars")),
         # sort key: finished if present, else started (the requested fallback)
         "sort_date": finished or started,
-        "category": str(meta.get("category", "")).strip(),
-        "tags": [str(t).strip() for t in (meta.get("tags") or [])],
+        # Derived from tags; kept as its own field for stats/CSV/EPUB output.
+        "category": next((t for t in tags if t in CATEGORY_TAGS), ""),
+        "tags": tags,
         "pages": pages,
         "body_html": markdown.markdown(body_md) if body_md else "",
     }
 
 
+def validate_books(books):
+    """Fail the build unless every book's tags are well-formed.
+
+    Rules: exactly one of CATEGORY_TAGS (fiction xor nonfiction) and no
+    duplicate tags. All offenders are reported in one pass so a bulk edit can
+    be fixed in one round trip.
+    """
+    errors = []
+    for b in books:
+        cats = [t for t in b["tags"] if t in CATEGORY_TAGS]
+        if len(cats) != 1:
+            errors.append(
+                f"books/{b['slug']}.md: tags must include exactly one of "
+                f"{' / '.join(CATEGORY_TAGS)}, found {cats or 'none'}"
+            )
+        dupes = sorted({t for t in b["tags"] if b["tags"].count(t) > 1})
+        if dupes:
+            errors.append(f"books/{b['slug']}.md: duplicate tags: {', '.join(dupes)}")
+    if errors:
+        raise SystemExit("Book validation failed:\n  " + "\n  ".join(errors))
+
+
 def load_books():
     books = [parse_book(p) for p in sorted(BOOKS_DIR.glob("*.md"))]
+    validate_books(books)
     # Default order: most recent first by sort_date (finished, else started).
     books.sort(key=lambda b: b["sort_date"], reverse=True)
     return books
@@ -151,13 +181,19 @@ def stars_display(n):
 
 def render_index(books):
     fields = ("slug", "title", "author", "finished", "started", "sort_date",
-              "category", "tags", "stars", "cover")
+              "tags", "stars", "cover")
     data = json.dumps([{k: b[k] for k in fields} for b in books], ensure_ascii=False)
-    # All distinct tags, for the tag filter.
-    tags = sorted({t for b in books for t in b["tags"]})
-    tag_options = "".join(f'<option value="{e(t)}">{e(t)}</option>' for t in tags)
+    # All distinct tags for the filter: category tags first, rest alphabetical.
+    all_tags = {t for b in books for t in b["tags"]}
+    tags = [t for t in CATEGORY_TAGS if t in all_tags]
+    tags += sorted(all_tags.difference(CATEGORY_TAGS))
+    tag_checkboxes = "".join(
+        f'<label class="multiselect-option">'
+        f'<input type="checkbox" value="{e(t)}"> {e(t)}</label>'
+        for t in tags
+    )
 
-    controls = template("controls.template.html").format(tag_options=tag_options)
+    controls = template("controls.template.html").format(tag_checkboxes=tag_checkboxes)
     body = template("index.template.html").format(controls=controls, data=data)
     return page("Reading", "", body, depth=0)
 
@@ -260,8 +296,6 @@ def render_book(book):
         meta_rows.append(("Finished", book["finished"]))
     if book["started"]:
         meta_rows.append(("Started", book["started"]))
-    if book["category"]:
-        meta_rows.append(("Category", book["category"]))
     if book["pages"]:
         meta_rows.append(("Pages", str(book["pages"])))
     if book["tags"]:

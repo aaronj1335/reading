@@ -19,8 +19,8 @@ isbn: 9780312424404       # Any ISBN. This is mostly used for cover tracking.
 finished: 2017-10-07       # ISO date, or leave blank: `finished:`
 started: 2017-08-24       # ISO date
 stars: 5                  # 1–5 Goodreads rating, or leave blank: `stars:`
-category: fiction          # fiction | nonfiction
-tags: []                  # Leave out if empty, otherwise something like [read-with-kids].
+tags: [fiction]           # Must include exactly one of fiction | nonfiction,
+                          # plus any other tags: [fiction, read-with-kids].
 ---
 
 Optional notes in Markdown go here; they render on the book's page.
