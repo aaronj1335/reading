@@ -344,19 +344,36 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
   height: 100%;
   gap: 0.4rem;
 }
-.rating-col-bar {
+/* Fixed-height area the bar percentage resolves against; padding-top reserves
+   room for the count label so a 100% bar doesn't push it out of the chart. */
+.rating-col-track {
+  flex: 1;
   width: 100%;
   max-width: 3.5rem;
+  display: flex;
+  align-items: flex-end;
+  padding-top: 1.5rem;
+}
+.rating-col-bar {
+  position: relative;
+  width: 100%;
   background: #e0a106;
   border-radius: 6px 6px 0 0;
   transition: height 0.4s ease;
   min-height: 2px;
 }
-.rating-col-count { font-size: 0.85rem; color: var(--muted); }
+.rating-col-count {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
 .rating-col-label {
   color: #e0a106;
   font-size: 0.85rem;
