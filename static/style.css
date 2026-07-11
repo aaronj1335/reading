@@ -162,6 +162,9 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
 .meta-label { width: 6.5rem; color: var(--muted); flex-shrink: 0; }
 .meta-value { text-transform: capitalize; }
 .book-body { margin-top: 1.4rem; }
+.edit-page { margin-top: 1.6rem; }
+.edit-link { color: var(--muted); text-decoration: none; font-size: 0.9rem; }
+.edit-link:hover { text-decoration: underline; color: var(--accent); }
 
 /* ---- Site header nav (Stats link / All books link) ---- */
 .site-header-row { display: flex; align-items: baseline; gap: 1rem; }
