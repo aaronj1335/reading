@@ -8,3 +8,5 @@ started: 2019-12-10
 stars: 3
 category: nonfiction
 ---
+
+Growing up you just kind of thought that what happened in Germany leading up to WWII was something that could never happen in the US. This book definitely gives you a clearer picture of the steps involved and breaks down that naivety.

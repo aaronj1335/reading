@@ -9,3 +9,5 @@ stars: 5
 category: fiction
 tags: [read-with-kids]
 ---
+
+> So be sure when you step, step with care and great tact, and remember that life's a great balancing act.

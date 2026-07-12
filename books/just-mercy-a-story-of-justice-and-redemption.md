@@ -8,3 +8,5 @@ started: 2020-06-03
 stars: 4
 category: nonfiction
 ---
+
+Brutally clear argument agains the death penalty in the context of the US criminal justice system.

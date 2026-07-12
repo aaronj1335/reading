@@ -9,3 +9,5 @@ stars: 4
 category: fiction
 tags: [read-with-kids]
 ---
+
+The old cob -- what a great character! Seems at first like this stodgy old formal guy, but when it comes to his family, he's unflinchingly proud of his son, even when he doesn't fit any mold.

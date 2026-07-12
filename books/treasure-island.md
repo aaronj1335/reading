@@ -9,3 +9,7 @@ stars: 3
 category: fiction
 tags: [read-with-kids]
 ---
+
+I remember reading this as a kid, getting like 3/4 of the way through it, and realizing I had no idea what was going on.
+
+Reading it as an adult, I see why. The language is tough, the motivations of the characters shift. I'm not actually sure what makes this a kids book.

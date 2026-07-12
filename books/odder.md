@@ -9,3 +9,5 @@ stars: 4
 category: fiction
 tags: [read-with-kids]
 ---
+
+One of those I enjoyed more than the kids. The kids still liked it. But I loved it.

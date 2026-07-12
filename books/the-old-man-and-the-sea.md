@@ -8,3 +8,5 @@ started: 2017-08-24
 stars: 4
 category: fiction
 ---
+
+First book I read as a grown up. Taught me to enjoy reading again. That first shark hit...

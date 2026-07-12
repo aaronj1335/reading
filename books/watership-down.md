@@ -8,3 +8,5 @@ started: 2018-05-29
 stars: 4
 category: fiction
 ---
+
+Just a rad group of rabbits. I think the different groups of rabbits they encounter demonstrate differnt ways that humans fail to find purpose and meaning in life.

@@ -8,3 +8,5 @@ started: 2021-11-26
 stars: 4
 category: nonfiction
 ---
+
+Read this after my first trip to Galveston, which gave it a pretty haunting edge.

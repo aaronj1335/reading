@@ -8,3 +8,5 @@ started: 2019-10-09
 stars: 4
 category: fiction
 ---
+
+I loved the way you can hear the dialect in the writing.

@@ -8,3 +8,5 @@ started: 2018-12-25
 stars: 4
 category: fiction
 ---
+
+Loved how this built on the historical period in which it was set. Ishiguro is a master at unreliable narrators.

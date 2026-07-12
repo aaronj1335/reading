@@ -8,3 +8,7 @@ started: 2022-04-12
 stars: 4
 category: fiction
 ---
+
+Absoltely epic, and it lives up to it all.
+
+Ivan's last conversation with Smerdyakov had my heart beating out of my chest.

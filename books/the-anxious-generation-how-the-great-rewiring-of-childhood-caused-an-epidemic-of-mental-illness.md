@@ -8,3 +8,5 @@ started: 2026-01-06
 stars: 5
 category: nonfiction
 ---
+
+This book gave words and solid explanations to what mostly just feels like common sense parenting.

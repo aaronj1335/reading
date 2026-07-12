@@ -8,3 +8,5 @@ started: 2026-10-12
 stars: 3
 category: nonfiction
 ---
+
+I don't read a lot of celebrity bios, but this was AWESOME.

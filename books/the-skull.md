@@ -9,3 +9,5 @@ stars: 4
 category: fiction
 tags: [read-with-kids]
 ---
+
+Such a cool spooky little read.
