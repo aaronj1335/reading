@@ -3,8 +3,8 @@ title: "The Anxious Generation: How the Great Rewiring of Childhood Caused an Ep
 author: Jonathan Haidt
 isbn: 9780593655030
 pages: 385
-finished: 2026-03-08
-started: 2026-01-06
+finished: 2025-03-08
+started: 2025-01-06
 stars: 5
 category: nonfiction
 ---
