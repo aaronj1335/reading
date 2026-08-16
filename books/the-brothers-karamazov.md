@@ -4,7 +4,7 @@ author: Fyodor Dostoevsky
 isbn: 9780374528379
 pages: 1095
 finished: 2025-12-29
-started: 2022-04-12
+started: 2025-04-12
 stars: 4
 category: fiction
 ---
