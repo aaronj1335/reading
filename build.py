@@ -7,7 +7,7 @@ parses them and renders:
 
   _site/index.html        searchable / filterable / sortable list
   _site/stats.html        reading statistics page
-  _site/want-to-read.html the "want to read" queue (source: want-to-read.md)
+  _site/want-to-read.html the "want to read" queue (source: want-to-read.yaml)
   _site/books/<slug>.html one page per book
   _site/reading.epub      EPUB 3 export for publish-on-demand services
   _site/index.js          copied from static/
@@ -41,7 +41,7 @@ import yaml
 
 ROOT = Path(__file__).parent
 BOOKS_DIR = ROOT / "books"
-WANT_TO_READ_FILE = ROOT / "want-to-read.md"
+WANT_TO_READ_FILE = ROOT / "want-to-read.yaml"
 STATIC_DIR = ROOT / "static"
 TEMPLATES_DIR = ROOT / "templates"
 SITE_DIR = ROOT / "_site"
@@ -58,27 +58,18 @@ NORMALIZE_CDN = "https://cdn.jsdelivr.net/npm/modern-normalize@3.0.1/modern-norm
 # link on book detail pages and the "Add a book" link on the want-to-read page.
 REPO_EDIT_BASE = "https://github.com/aaronj1335/reading/edit/main/"
 EDIT_URL_BASE = f"{REPO_EDIT_BASE}books/"
-WANT_TO_READ_EDIT_URL = f"{REPO_EDIT_BASE}want-to-read.md"
+WANT_TO_READ_EDIT_URL = f"{REPO_EDIT_BASE}want-to-read.yaml"
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.DOTALL)
 
-# A want-to-read entry: a bullet at the very start of a line. Requiring column
-# zero keeps indented example blocks (and nested bullets) out of the list.
-WANT_ITEM_RE = re.compile(r"^[-*+]\s+(.*)$")
-# Title / author / note separator within one entry: an em or en dash, or `--`
-# for anyone typing on a phone keyboard. A lone hyphen is deliberately not a
-# separator — plenty of real titles contain one.
-WANT_SPLIT_RE = re.compile(r"\s+(?:—|–|--)\s+")
 
+def book_from_meta(meta, slug, body_md=""):
+    """Normalise one book's metadata into the dict the rest of the build uses.
 
-def parse_book(path):
-    """Parse a book Markdown file into a dict; body rendered to HTML."""
-    text = path.read_text(encoding="utf-8")
-    m = FRONTMATTER_RE.match(text)
-    if not m:
-        raise ValueError(f"{path.name}: missing YAML frontmatter")
-    meta = yaml.safe_load(m.group(1)) or {}
-    body_md = m.group(2).strip()
+    `meta` is the field set documented in the README — the YAML frontmatter of
+    a books/*.md file, or one entry of want-to-read.yaml, which uses the same
+    fields so a queued book can move into books/ unchanged.
+    """
 
     def as_date(value):
         # PyYAML may parse a date into a date object; normalise to ISO string.
@@ -109,7 +100,7 @@ def parse_book(path):
         pages = None
 
     return {
-        "slug": path.stem,
+        "slug": slug,
         "title": title,
         "author": str(meta.get("author", "")).strip(),
         "finished": finished,
@@ -125,6 +116,20 @@ def parse_book(path):
     }
 
 
+def parse_book(path):
+    """Parse a book Markdown file into a dict; body rendered to HTML."""
+    text = path.read_text(encoding="utf-8")
+    m = FRONTMATTER_RE.match(text)
+    if not m:
+        raise ValueError(f"{path.name}: missing YAML frontmatter")
+    return book_from_meta(yaml.safe_load(m.group(1)) or {}, path.stem, m.group(2).strip())
+
+
+def slugify(title):
+    """Slug for a title, matching the books/<slug>.md filename convention."""
+    return re.sub(r"[^a-z0-9]+", "-", title.lower()).strip("-")
+
+
 def load_books():
     books = [parse_book(p) for p in sorted(BOOKS_DIR.glob("*.md"))]
     # Default order: most recent first by sort_date (finished, else started).
@@ -133,48 +138,38 @@ def load_books():
 
 
 def load_want_to_read():
-    """Parse want-to-read.md into a list of {title, author, note} dicts.
+    """Parse want-to-read.yaml into the same book dicts load_books() returns.
 
-    The file is a plain Markdown bullet list — one book per line, written as
-    `- Title — Author — an optional note`, with the author and note both
-    optional. Order is preserved (the file is kept newest-first by hand), and
-    every line that is not a top-level bullet is ignored, so the file can carry
-    its own instructions and stray notes without them leaking onto the page.
+    The file is a YAML list whose entries use the field set of book
+    frontmatter, so an entry can be lifted into books/<slug>.md once the book
+    is started. In practice a queued book carries no finished/started/stars —
+    those are what it picks up on the way to books/ — and `notes:` plays the
+    part the Markdown body plays in a book file. Entries keep their file order
+    (newest first by convention).
     """
     if not WANT_TO_READ_FILE.exists():
         return []
 
-    items = []
-    in_fence = False
-    for line in WANT_TO_READ_FILE.read_text(encoding="utf-8").splitlines():
-        if line.lstrip().startswith("```"):
-            in_fence = not in_fence
-            continue
-        m = WANT_ITEM_RE.match(line)
-        if in_fence or not m:
-            continue
-        parts = WANT_SPLIT_RE.split(m.group(1).strip(), maxsplit=2)
-        parts += [""] * (3 - len(parts))
-        title, author, note = (p.strip() for p in parts)
-        if title:
-            items.append({"title": title, "author": author, "note": note})
-    return items
+    entries = yaml.safe_load(WANT_TO_READ_FILE.read_text(encoding="utf-8")) or []
+    if not isinstance(entries, list):
+        raise ValueError(f"{WANT_TO_READ_FILE.name}: expected a list of books")
+
+    books = []
+    for entry in entries:
+        if not isinstance(entry, dict):
+            # Most likely a bare `- Some Title` line rather than a mapping.
+            raise ValueError(
+                f"{WANT_TO_READ_FILE.name}: expected `- title: ...` entries, got {entry!r}"
+            )
+        title = str(entry.get("title", "")).strip()
+        if not title:
+            raise ValueError(f"{WANT_TO_READ_FILE.name}: an entry is missing `title`")
+        books.append(book_from_meta(entry, slugify(title), str(entry.get("notes") or "")))
+    return books
 
 
 def e(s):
     return html.escape(s, quote=True)
-
-
-def inline_md(text):
-    """Render a snippet of inline Markdown (links, emphasis) to HTML.
-
-    Want-to-read entries are free text, so a bare `[title](url)` or `*emphasis*`
-    should work the way it does anywhere else in the repo. Markdown wraps its
-    output in a paragraph; strip that so the result can sit inside a span.
-    """
-    rendered = markdown.markdown(text.strip())
-    m = re.fullmatch(r"<p>(.*)</p>", rendered, re.DOTALL)
-    return m.group(1) if m else rendered
 
 
 def page(title, head_extra, body, depth):
@@ -199,6 +194,18 @@ def title_html(title):
     if not sep or not subtitle:
         return e(title)
     return f'{e(main.strip())}<span class="subtitle">{e(subtitle)}</span>'
+
+
+def cover_attrs(book, prefix=""):
+    """`src` plus an onerror fallback for a book's cover <img>.
+
+    A real cover (from `cover:` or an ISBN lookup) may 404, so anything but the
+    generated SVG gets an onerror that swaps in covers/<slug>.svg.
+    """
+    fallback = f"{prefix}covers/{e(book['slug'])}.svg"
+    if not book["cover"]:
+        return fallback, ""
+    return e(book["cover"]), f" onerror=\"this.onerror=null;this.src='{fallback}'\""
 
 
 def stars_display(n):
@@ -309,36 +316,46 @@ def render_stats(books):
     return page("Reading Stats", "", body, depth=0)
 
 
-def render_want_to_read(items):
+def render_want_to_read(books):
     """Render the standalone "want to read" queue page.
 
-    The list is short and static, so unlike the index it ships as plain server-
-    rendered HTML: no data blob, no JavaScript, no filters.
+    The list is short and static, so unlike the index it ships as plain
+    server-rendered HTML: no data blob, no JavaScript, no filters. Cards match
+    the index's, minus the parts a book only has once it has been read.
     """
-    def title_fragment(title):
-        # Plain titles get the same "subtitle after the colon" treatment as the
-        # rest of the site; a title carrying Markdown (a link, emphasis) renders
-        # as written instead, since splitting it could cut a link in half.
-        return inline_md(title) if re.search(r"[\[\]*_`]", title) else title_html(title)
-
     cards = []
-    for item in items:
-        author = (
-            f'<span class="want-author">{inline_md(item["author"])}</span>'
-            if item["author"] else ""
+    for book in books:
+        cover_src, onerror = cover_attrs(book)
+        meta_parts = []
+        if book["category"]:
+            meta_parts.append(
+                f'<span class="badge badge-{e(book["category"])}">'
+                f'{e(book["category"])}</span>'
+            )
+        meta_parts += [f'<span class="tag">{e(t)}</span>' for t in book["tags"]]
+        if book["pages"]:
+            meta_parts.append(f'<span class="card-date">{book["pages"]} pages</span>')
+        meta_html = (
+            f'<span class="card-meta">{"".join(meta_parts)}</span>' if meta_parts else ""
         )
-        note = (
-            f'<p class="want-note">{inline_md(item["note"])}</p>'
-            if item["note"] else ""
+        notes_html = (
+            f'<div class="want-note">{book["body_html"]}</div>' if book["body_html"] else ""
+        )
+        author_html = (
+            f'<span class="card-author">{e(book["author"])}</span>' if book["author"] else ""
         )
         cards.append(
             f'<li class="card want-card">'
-            f'<span class="want-title">{title_fragment(item["title"])}</span>'
-            f"{author}{note}</li>"
+            f'<img class="card-cover" src="{cover_src}"{onerror} alt="" '
+            f'width="300" height="450" loading="lazy">'
+            f'<div class="card-text">'
+            f'<span class="card-title">{title_html(book["title"])}</span>'
+            f'{author_html}{meta_html}{notes_html}'
+            f"</div></li>"
         )
 
-    empty_html = "" if items else '<p class="empty">Nothing on the list yet.</p>'
-    count_text = f"{len(items)} book{'' if len(items) == 1 else 's'} queued up"
+    empty_html = "" if books else '<p class="empty">Nothing on the list yet.</p>'
+    count_text = f"{len(books)} book{'' if len(books) == 1 else 's'} queued up"
 
     body = template("want-to-read.template.html").format(
         count_text=e(count_text),
@@ -369,11 +386,7 @@ def render_book(book):
         for k, v in meta_rows
     )
     body_html = f'<div class="book-body">{book["body_html"]}</div>' if book["body_html"] else ""
-    fallback = f"../covers/{e(book['slug'])}.svg"
-    cover_src = e(book["cover"]) if book["cover"] else fallback
-    onerror = (
-        f" onerror=\"this.onerror=null;this.src='{fallback}'\"" if book["cover"] else ""
-    )
+    cover_src, onerror = cover_attrs(book, prefix="../")
     body = template("book.template.html").format(
         cover_src=cover_src,
         onerror=onerror,
@@ -624,15 +637,26 @@ def main():
 
     books = load_books()
 
+    want_to_read = load_want_to_read()
+    book_slugs = {b["slug"] for b in books}
+
     (SITE_DIR / "covers").mkdir()
     for book in books:
+        (SITE_DIR / "covers" / f"{book['slug']}.svg").write_text(
+            cover_svg(book), encoding="utf-8"
+        )
+    # Queued books get the same generated cover, so the want-to-read page has
+    # something to show for an entry with no ISBN (or a cover that 404s).
+    for book in want_to_read:
+        if book["slug"] in book_slugs:
+            print(f"  note: {book['title']!r} is queued but already in books/")
+            continue
         (SITE_DIR / "covers" / f"{book['slug']}.svg").write_text(
             cover_svg(book), encoding="utf-8"
         )
 
     (SITE_DIR / "index.html").write_text(render_index(books), encoding="utf-8")
     (SITE_DIR / "stats.html").write_text(render_stats(books), encoding="utf-8")
-    want_to_read = load_want_to_read()
     (SITE_DIR / "want-to-read.html").write_text(
         render_want_to_read(want_to_read), encoding="utf-8"
     )

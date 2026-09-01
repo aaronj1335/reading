@@ -43,24 +43,33 @@ lines left-aligned relative to each other.
 
 ## Want to read
 
-`want-to-read.md` is the queue of books to get to next — a plain Markdown
-bullet list, one book per line:
+`want-to-read.yaml` is the queue of books to get to next: a YAML list whose
+entries use the same fields as the frontmatter above, so an entry can be lifted
+straight into `books/<slug>.md` once the book is started.
 
-```markdown
-- Title — Author — an optional note
+```yaml
+- title: Gilead
+  author: Marilynne Robinson
+  isbn: 9780312424404        # any ISBN; used to find cover art
+  pages: 247
+  category: fiction          # fiction | nonfiction
+  tags: [read-with-kids]
+  notes: Markdown, rendered under the entry.
 ```
 
-Author and note are optional, `--` works in place of the em dash, and anything
-that is not a top-level bullet (headings, prose, indented or fenced blocks) is
-ignored, so the file can hold notes to self. Entries keep their file order,
-newest first by convention.
+Only `title` is required. `notes:` plays the part the Markdown body plays in a
+book file, and `finished` / `started` / `stars` are simply the fields a book
+picks up on its way into `books/`. Entries keep their file order — newest
+first, by convention.
 
 The build renders the list at `_site/want-to-read.html`, a standalone page
-linked from the site header. That page's "Add a book" link opens
-`want-to-read.md` in the GitHub web editor, so a book can be queued from a
-phone in a few taps — the same trick as "Edit this page" on a book page.
+linked from the site header, with the same cards as the index. That page's
+"Add a book" link opens `want-to-read.yaml` in the GitHub web editor, so a
+book can be queued from a phone — the same trick as "Edit this page" on a book
+page.
 
-When a book gets picked up, delete its line and add `books/<slug>.md`.
+When a book gets picked up, move its entry into `books/<slug>.md`; the build
+prints a note if a queued title is already there.
 
 ## Publish-on-demand export
 

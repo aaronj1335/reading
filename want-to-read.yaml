@@ -1,0 +1,173 @@
+# Books I want to read next — the queue behind
+# https://aaronstacy.com/reading/want-to-read.html.
+#
+# One entry per book, using the same fields as the YAML frontmatter in
+# books/*.md, so an entry can be lifted straight into books/<slug>.md once it
+# is started:
+#
+#   - title: Gilead
+#     author: Marilynne Robinson
+#     isbn: 9780312424404      # any ISBN; used to find cover art
+#     pages: 247
+#     category: fiction        # fiction | nonfiction
+#     tags: [read-with-kids]
+#     notes: Recommended by a friend. Markdown, shown under the entry.
+#
+# Only `title` is required; everything else is optional. The read-only fields
+# (finished, started, stars) are what a book picks up once it moves to books/.
+# Newest addition first, by convention.
+
+- title: 'The Boys in the Boat: Nine Americans and Their Epic Quest for Gold at the 1936 Berlin Olympics'
+  author: Daniel James Brown
+  isbn: 9780670025817
+  pages: 404
+  category: nonfiction
+- title: The Force
+  author: David Dorsey
+  isbn: 9780345376251
+  pages: 336
+  category: nonfiction
+- title: Train Dreams
+  author: Denis Johnson
+  isbn: 9781250007650
+  pages: 116
+  category: fiction
+- title: 'Team of Rivals: The Political Genius of Abraham Lincoln'
+  author: Doris Kearns Goodwin
+  pages: 916
+  category: nonfiction
+- title: Theo of Golden
+  author: Allen Levi
+  isbn: 9798988702900
+  pages: 399
+  category: fiction
+- title: The Wind-Up Bird Chronicle
+  author: Haruki Murakami
+  isbn: 9780965341981
+  pages: 607
+  category: fiction
+- title: 'The Power Broker: Robert Moses and the Fall of New York'
+  author: Robert A. Caro
+  isbn: 9780394720241
+  pages: 1246
+  category: nonfiction
+- title: 'Countdown to Zero Day: Stuxnet and the Launch of the World''s First Digital Weapon'
+  author: Kim Zetter
+  isbn: 9780770436179
+  pages: 406
+  category: nonfiction
+- title: Rome Was Not Built in a Day - The Story of the Roman People vol. I
+  author: Nanami Shiono
+  pages: 308
+  category: nonfiction
+- title: 'The Warmth of Other Suns: The Epic Story of America''s Great Migration'
+  author: Isabel Wilkerson
+  isbn: 9780679444329
+  pages: 640
+  category: nonfiction
+- title: Wolf Hall
+  author: Hilary Mantel
+  pages: 653
+  category: fiction
+- title: The Return
+  author: Hisham Matar
+  isbn: 9780345807748
+  pages: 256
+  category: nonfiction
+- title: The Sympathizer
+  author: Viet Thanh Nguyen
+  isbn: 9780802123459
+  pages: 384
+  category: fiction
+- title: 'The Missing Billionaires: A Guide to Better Financial Decisions'
+  author: Victor Haghani
+  isbn: 9781119747918
+  pages: 416
+  category: nonfiction
+- title: 'King of Capital: The Remarkable Rise, Fall, and Rise Again of Steve Schwarzman and Blackstone'
+  author: David Carey
+  isbn: 9780307452993
+  pages: 400
+  category: nonfiction
+- title: 'Plunder: Private Equity''s Plan to Pillage America'
+  author: Brendan Ballou
+  isbn: 9781541702103
+  pages: 368
+  category: nonfiction
+- title: 'The Fund: Ray Dalio, Bridgewater Associates, and the Unraveling of a Wall Street Legend'
+  author: Rob Copeland
+  isbn: 9781250276933
+  pages: 352
+  category: nonfiction
+- title: 'Let''s Go (So We Can Get Back): A Memoir of Recording and Discording with Wilco, Etc.'
+  author: Jeff Tweedy
+  isbn: 9781101985281
+  pages: 303
+  category: nonfiction
+- title: Kim
+  author: Rudyard Kipling
+  isbn: 9780140183528
+  pages: 366
+  category: fiction
+- title: The Tale of Despereaux
+  author: Kate DiCamillo
+  isbn: 9780763625290
+  pages: 272
+  category: fiction
+  tags: [read-with-kids]
+- title: Bridge to Terabithia
+  author: Katherine Paterson
+  pages: 190
+  category: fiction
+  tags: [read-with-kids]
+- title: Matilda
+  author: Roald Dahl
+  isbn: 9780435123987
+  pages: 240
+  category: fiction
+  tags: [read-with-kids]
+- title: A Wrinkle in Time
+  author: adeleine L'Engl
+  isbn: 9781250153272
+  pages: 218
+  category: fiction
+  tags: [read-with-kids]
+- title: The One and Only Ivan
+  author: Katherine Applegate
+  isbn: 9780061992254
+  pages: 304
+  category: fiction
+  tags: [read-with-kids]
+- title: Solito
+  author: Javier Zamora
+  isbn: 9780593498064
+  pages: 384
+  category: nonfiction
+- title: Don Quixote
+  author: Miguel de Cervantes Saavedra
+  pages: 1023
+  category: fiction
+- title: Zorrie
+  author: Laird Hunt
+  isbn: 9781635575361
+  pages: 176
+  category: fiction
+- title: My Life as a Cat
+  author: Carlie Sorosiak
+  isbn: 9781788006088
+  pages: 272
+  category: fiction
+- title: Watchmen
+  author: Alan Moore
+  isbn: 9781779501127
+  pages: 448
+  category: fiction
+- title: One Flew Over the Cuckoo's Nest
+  author: Ken Kesey
+  pages: 336
+  category: fiction
+- title: The Path to Power
+  author: Robert A. Caro
+  isbn: 9780679729457
+  pages: 882
+  category: nonfiction
