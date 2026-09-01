@@ -171,6 +171,28 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
 .site-nav-link { font-size: 0.9rem; color: var(--accent); text-decoration: none; }
 .site-nav-link:hover { text-decoration: underline; }
 
+/* ---- Want-to-read page ---- */
+.add-cta { margin: 1.1rem 0 0; }
+.add-link {
+  display: inline-block;
+  padding: 0.7rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.add-link:hover { border-color: var(--accent); }
+.add-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.want-list { margin-top: 0.9rem; }
+.want-card { display: flex; flex-direction: column; }
+.want-title { font-weight: 600; font-size: 1.05rem; }
+.want-author { color: var(--muted); font-size: 0.92rem; }
+.want-note { margin: 0.45rem 0 0; color: var(--muted); font-size: 0.9rem; }
+.want-card a { color: var(--accent); }
+
 /* ---- Stats page ---- */
 .stats-page { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 2rem; }
 

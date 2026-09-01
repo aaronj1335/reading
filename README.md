@@ -41,6 +41,27 @@ stanza:
 are typeset as poetry: the poem is centered on its longest line, with the
 lines left-aligned relative to each other.
 
+## Want to read
+
+`want-to-read.md` is the queue of books to get to next — a plain Markdown
+bullet list, one book per line:
+
+```markdown
+- Title — Author — an optional note
+```
+
+Author and note are optional, `--` works in place of the em dash, and anything
+that is not a top-level bullet (headings, prose, indented or fenced blocks) is
+ignored, so the file can hold notes to self. Entries keep their file order,
+newest first by convention.
+
+The build renders the list at `_site/want-to-read.html`, a standalone page
+linked from the site header. That page's "Add a book" link opens
+`want-to-read.md` in the GitHub web editor, so a book can be queued from a
+phone in a few taps — the same trick as "Edit this page" on a book page.
+
+When a book gets picked up, delete its line and add `books/<slug>.md`.
+
 ## Publish-on-demand export
 
 The build writes `_site/reading.epub`, an EPUB 3 with a cover, title page,

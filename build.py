@@ -7,6 +7,7 @@ parses them and renders:
 
   _site/index.html        searchable / filterable / sortable list
   _site/stats.html        reading statistics page
+  _site/want-to-read.html the "want to read" queue (source: want-to-read.md)
   _site/books/<slug>.html one page per book
   _site/reading.epub      EPUB 3 export for publish-on-demand services
   _site/index.js          copied from static/
@@ -40,6 +41,7 @@ import yaml
 
 ROOT = Path(__file__).parent
 BOOKS_DIR = ROOT / "books"
+WANT_TO_READ_FILE = ROOT / "want-to-read.md"
 STATIC_DIR = ROOT / "static"
 TEMPLATES_DIR = ROOT / "templates"
 SITE_DIR = ROOT / "_site"
@@ -52,10 +54,21 @@ def template(name):
 
 NORMALIZE_CDN = "https://cdn.jsdelivr.net/npm/modern-normalize@3.0.1/modern-normalize.min.css"
 
-# Base URL for the "Edit this page" link on book detail pages.
-EDIT_URL_BASE = "https://github.com/aaronj1335/reading/edit/main/books/"
+# Base URL for the GitHub web editor, which backs both the "Edit this page"
+# link on book detail pages and the "Add a book" link on the want-to-read page.
+REPO_EDIT_BASE = "https://github.com/aaronj1335/reading/edit/main/"
+EDIT_URL_BASE = f"{REPO_EDIT_BASE}books/"
+WANT_TO_READ_EDIT_URL = f"{REPO_EDIT_BASE}want-to-read.md"
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.DOTALL)
+
+# A want-to-read entry: a bullet at the very start of a line. Requiring column
+# zero keeps indented example blocks (and nested bullets) out of the list.
+WANT_ITEM_RE = re.compile(r"^[-*+]\s+(.*)$")
+# Title / author / note separator within one entry: an em or en dash, or `--`
+# for anyone typing on a phone keyboard. A lone hyphen is deliberately not a
+# separator — plenty of real titles contain one.
+WANT_SPLIT_RE = re.compile(r"\s+(?:—|–|--)\s+")
 
 
 def parse_book(path):
@@ -119,8 +132,49 @@ def load_books():
     return books
 
 
+def load_want_to_read():
+    """Parse want-to-read.md into a list of {title, author, note} dicts.
+
+    The file is a plain Markdown bullet list — one book per line, written as
+    `- Title — Author — an optional note`, with the author and note both
+    optional. Order is preserved (the file is kept newest-first by hand), and
+    every line that is not a top-level bullet is ignored, so the file can carry
+    its own instructions and stray notes without them leaking onto the page.
+    """
+    if not WANT_TO_READ_FILE.exists():
+        return []
+
+    items = []
+    in_fence = False
+    for line in WANT_TO_READ_FILE.read_text(encoding="utf-8").splitlines():
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        m = WANT_ITEM_RE.match(line)
+        if in_fence or not m:
+            continue
+        parts = WANT_SPLIT_RE.split(m.group(1).strip(), maxsplit=2)
+        parts += [""] * (3 - len(parts))
+        title, author, note = (p.strip() for p in parts)
+        if title:
+            items.append({"title": title, "author": author, "note": note})
+    return items
+
+
 def e(s):
     return html.escape(s, quote=True)
+
+
+def inline_md(text):
+    """Render a snippet of inline Markdown (links, emphasis) to HTML.
+
+    Want-to-read entries are free text, so a bare `[title](url)` or `*emphasis*`
+    should work the way it does anywhere else in the repo. Markdown wraps its
+    output in a paragraph; strip that so the result can sit inside a span.
+    """
+    rendered = markdown.markdown(text.strip())
+    m = re.fullmatch(r"<p>(.*)</p>", rendered, re.DOTALL)
+    return m.group(1) if m else rendered
 
 
 def page(title, head_extra, body, depth):
@@ -253,6 +307,46 @@ def render_stats(books):
     )
 
     return page("Reading Stats", "", body, depth=0)
+
+
+def render_want_to_read(items):
+    """Render the standalone "want to read" queue page.
+
+    The list is short and static, so unlike the index it ships as plain server-
+    rendered HTML: no data blob, no JavaScript, no filters.
+    """
+    def title_fragment(title):
+        # Plain titles get the same "subtitle after the colon" treatment as the
+        # rest of the site; a title carrying Markdown (a link, emphasis) renders
+        # as written instead, since splitting it could cut a link in half.
+        return inline_md(title) if re.search(r"[\[\]*_`]", title) else title_html(title)
+
+    cards = []
+    for item in items:
+        author = (
+            f'<span class="want-author">{inline_md(item["author"])}</span>'
+            if item["author"] else ""
+        )
+        note = (
+            f'<p class="want-note">{inline_md(item["note"])}</p>'
+            if item["note"] else ""
+        )
+        cards.append(
+            f'<li class="card want-card">'
+            f'<span class="want-title">{title_fragment(item["title"])}</span>'
+            f"{author}{note}</li>"
+        )
+
+    empty_html = "" if items else '<p class="empty">Nothing on the list yet.</p>'
+    count_text = f"{len(items)} book{'' if len(items) == 1 else 's'} queued up"
+
+    body = template("want-to-read.template.html").format(
+        count_text=e(count_text),
+        add_url=e(WANT_TO_READ_EDIT_URL),
+        items_html="".join(cards),
+        empty_html=empty_html,
+    )
+    return page("Want to Read", "", body, depth=0)
 
 
 def render_book(book):
@@ -538,6 +632,10 @@ def main():
 
     (SITE_DIR / "index.html").write_text(render_index(books), encoding="utf-8")
     (SITE_DIR / "stats.html").write_text(render_stats(books), encoding="utf-8")
+    want_to_read = load_want_to_read()
+    (SITE_DIR / "want-to-read.html").write_text(
+        render_want_to_read(want_to_read), encoding="utf-8"
+    )
     for book in books:
         (SITE_DIR / "books" / f"{book['slug']}.html").write_text(
             render_book(book), encoding="utf-8"
@@ -551,7 +649,10 @@ def main():
         shutil.copy(STATIC_DIR / asset, SITE_DIR / asset)
     (SITE_DIR / ".nojekyll").write_text("", encoding="utf-8")
 
-    print(f"Built {len(books)} books into {SITE_DIR}/")
+    print(
+        f"Built {len(books)} books "
+        f"({len(want_to_read)} on the want-to-read list) into {SITE_DIR}/"
+    )
 
 
 if __name__ == "__main__":
