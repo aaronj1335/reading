@@ -61,10 +61,22 @@ REPO_EDIT_BASE = "https://github.com/aaronj1335/reading/edit/main/"
 EDIT_URL_BASE = f"{REPO_EDIT_BASE}books/"
 WANT_TO_READ_EDIT_URL = f"{REPO_EDIT_BASE}want-to-read.yaml"
 
-# Where a queued book links out to for a summary. Both forms are derived from
-# what an entry already carries, so linking costs no extra metadata.
-GOODREADS_ISBN_URL = "https://www.goodreads.com/book/isbn/{isbn}"
-GOODREADS_SEARCH_URL = "https://www.goodreads.com/search?q={query}"
+# Where a queued book links out to for a summary: (label, by-ISBN, by-search).
+# Both sites are reachable from what an entry already carries, so linking costs
+# no extra metadata per book. Open Library leads — it is where the covers come
+# from, and its ISBN route is the more dependable of the two.
+SUMMARY_SITES = (
+    (
+        "Open Library",
+        "https://openlibrary.org/isbn/{isbn}",
+        "https://openlibrary.org/search?q={query}",
+    ),
+    (
+        "Goodreads",
+        "https://www.goodreads.com/book/isbn/{isbn}",
+        "https://www.goodreads.com/search?q={query}",
+    ),
+)
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.DOTALL)
 
@@ -203,17 +215,23 @@ def title_html(title):
     return f'{e(main.strip())}<span class="subtitle">{e(subtitle)}</span>'
 
 
-def goodreads_url(book):
-    """Link to a book's Goodreads page, derived from the entry itself.
+def summary_links(book):
+    """(label, url) pairs for reading about a book elsewhere.
 
-    An ISBN resolves straight to the book; without one (or if Goodreads has no
-    record of that ISBN) a title-and-author search lands on it in one more tap.
-    Either way there is nothing extra to record per book.
+    Each link is derived from the entry itself: an ISBN resolves straight to
+    the book's page, and without one (or when a site has no record of that
+    ISBN) a title-and-author search lands on it in one more tap. Either way
+    there is nothing extra to record per book.
     """
-    if book["isbn"]:
-        return GOODREADS_ISBN_URL.format(isbn=book["isbn"])
     query = urllib.parse.quote_plus(f"{book['title']} {book['author']}".strip())
-    return GOODREADS_SEARCH_URL.format(query=query)
+    return [
+        (
+            label,
+            isbn_url.format(isbn=book["isbn"]) if book["isbn"]
+            else search_url.format(query=query),
+        )
+        for label, isbn_url, search_url in SUMMARY_SITES
+    ]
 
 
 def cover_attrs(book, prefix=""):
@@ -341,9 +359,9 @@ def render_want_to_read(books):
 
     The list is short and static, so unlike the index it ships as plain
     server-rendered HTML: no data blob, no JavaScript, no filters. Cards match
-    the index's, minus the parts a book only has once it has been read; where
-    an index card links to the book's own page, a queued one links out to its
-    Goodreads summary.
+    the index's, minus the parts a book only has once it has been read. Where
+    an index card links to the book's own page, a queued one carries links out
+    to a summary of it — see summary_links().
     """
     cards = []
     for book in books:
@@ -357,28 +375,29 @@ def render_want_to_read(books):
         meta_parts += [f'<span class="tag">{e(t)}</span>' for t in book["tags"]]
         if book["pages"]:
             meta_parts.append(f'<span class="card-pages">{book["pages"]} pages</span>')
-        # The card links out to Goodreads for a summary, so say so rather than
-        # leaving a card that silently leaves the site.
-        meta_parts.append('<span class="card-source">Goodreads&nbsp;↗</span>')
+        meta_html = (
+            f'<span class="card-meta">{"".join(meta_parts)}</span>' if meta_parts else ""
+        )
+        links_html = "".join(
+            f'<a class="want-link" href="{e(url)}" target="_blank" rel="noopener">'
+            f"{e(label)}&nbsp;↗</a>"
+            for label, url in summary_links(book)
+        )
         author_html = (
             f'<span class="card-author">{e(book["author"])}</span>' if book["author"] else ""
         )
-        # Notes sit outside the link: they are Markdown and may contain links
-        # of their own, which cannot nest inside an anchor.
         notes_html = (
             f'<div class="want-note">{book["body_html"]}</div>' if book["body_html"] else ""
         )
         cards.append(
             f'<li class="card want-card">'
-            f'<a class="card-link" href="{e(goodreads_url(book))}" '
-            f'target="_blank" rel="noopener">'
             f'<img class="card-cover" src="{cover_src}"{onerror} alt="" '
             f'width="300" height="450" loading="lazy">'
-            f'<span class="card-text">'
+            f'<div class="card-text">'
             f'<span class="card-title">{title_html(book["title"])}</span>'
-            f'{author_html}'
-            f'<span class="card-meta">{"".join(meta_parts)}</span>'
-            f'</span></a>{notes_html}</li>'
+            f'{author_html}{meta_html}{notes_html}'
+            f'<span class="want-links">{links_html}</span>'
+            f"</div></li>"
         )
 
     empty_html = "" if books else '<p class="empty">Nothing on the list yet.</p>'

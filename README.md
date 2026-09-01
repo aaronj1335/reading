@@ -63,10 +63,10 @@ picks up on its way into `books/`. Entries keep their file order — newest
 first, by convention.
 
 The build renders the list at `_site/want-to-read.html`, a standalone page
-linked from the site header, with the same cards as the index. Each card links
-out to the book on Goodreads for a quick summary — by ISBN when the entry has
-one, otherwise a title-and-author search — so nothing extra has to be recorded
-per book. That page's
+linked from the site header, with the same cards as the index. Each card
+carries Open Library and Goodreads links for a quick summary — by ISBN when
+the entry has one, otherwise a title-and-author search — so nothing extra has
+to be recorded per book. That page's
 "Add a book" link opens `want-to-read.yaml` in the GitHub web editor, so a
 book can be queued from a phone — the same trick as "Edit this page" on a book
 page.
