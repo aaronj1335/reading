@@ -189,11 +189,13 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
 /* Same card as the index, without the link wrapper — a queued book has no
    page of its own yet. */
 .want-list { margin-top: 0.9rem; }
-.want-card { display: flex; gap: 0.85rem; align-items: flex-start; }
+.want-card { display: flex; flex-direction: column; }
 .want-note { margin-top: 0.55rem; font-size: 0.9rem; color: var(--muted); }
 .want-note p { margin: 0; }
 .want-note p + p { margin-top: 0.5rem; }
 .want-note a { color: var(--accent); }
+.card-pages { color: var(--muted); }
+.card-source { margin-left: auto; color: var(--accent); white-space: nowrap; }
 
 /* ---- Stats page ---- */
 .stats-page { max-width: var(--maxw); margin: 0 auto; padding: 1rem 1rem 2rem; }

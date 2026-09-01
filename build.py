@@ -28,6 +28,7 @@ import json
 import re
 import shutil
 import textwrap
+import urllib.parse
 import uuid
 import zipfile
 from collections import defaultdict
@@ -59,6 +60,11 @@ NORMALIZE_CDN = "https://cdn.jsdelivr.net/npm/modern-normalize@3.0.1/modern-norm
 REPO_EDIT_BASE = "https://github.com/aaronj1335/reading/edit/main/"
 EDIT_URL_BASE = f"{REPO_EDIT_BASE}books/"
 WANT_TO_READ_EDIT_URL = f"{REPO_EDIT_BASE}want-to-read.yaml"
+
+# Where a queued book links out to for a summary. Both forms are derived from
+# what an entry already carries, so linking costs no extra metadata.
+GOODREADS_ISBN_URL = "https://www.goodreads.com/book/isbn/{isbn}"
+GOODREADS_SEARCH_URL = "https://www.goodreads.com/search?q={query}"
 
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)$", re.DOTALL)
 
@@ -102,6 +108,7 @@ def book_from_meta(meta, slug, body_md=""):
     return {
         "slug": slug,
         "title": title,
+        "isbn": isbn,
         "author": str(meta.get("author", "")).strip(),
         "finished": finished,
         "started": started,
@@ -194,6 +201,19 @@ def title_html(title):
     if not sep or not subtitle:
         return e(title)
     return f'{e(main.strip())}<span class="subtitle">{e(subtitle)}</span>'
+
+
+def goodreads_url(book):
+    """Link to a book's Goodreads page, derived from the entry itself.
+
+    An ISBN resolves straight to the book; without one (or if Goodreads has no
+    record of that ISBN) a title-and-author search lands on it in one more tap.
+    Either way there is nothing extra to record per book.
+    """
+    if book["isbn"]:
+        return GOODREADS_ISBN_URL.format(isbn=book["isbn"])
+    query = urllib.parse.quote_plus(f"{book['title']} {book['author']}".strip())
+    return GOODREADS_SEARCH_URL.format(query=query)
 
 
 def cover_attrs(book, prefix=""):
@@ -321,7 +341,9 @@ def render_want_to_read(books):
 
     The list is short and static, so unlike the index it ships as plain
     server-rendered HTML: no data blob, no JavaScript, no filters. Cards match
-    the index's, minus the parts a book only has once it has been read.
+    the index's, minus the parts a book only has once it has been read; where
+    an index card links to the book's own page, a queued one links out to its
+    Goodreads summary.
     """
     cards = []
     for book in books:
@@ -334,24 +356,29 @@ def render_want_to_read(books):
             )
         meta_parts += [f'<span class="tag">{e(t)}</span>' for t in book["tags"]]
         if book["pages"]:
-            meta_parts.append(f'<span class="card-date">{book["pages"]} pages</span>')
-        meta_html = (
-            f'<span class="card-meta">{"".join(meta_parts)}</span>' if meta_parts else ""
-        )
-        notes_html = (
-            f'<div class="want-note">{book["body_html"]}</div>' if book["body_html"] else ""
-        )
+            meta_parts.append(f'<span class="card-pages">{book["pages"]} pages</span>')
+        # The card links out to Goodreads for a summary, so say so rather than
+        # leaving a card that silently leaves the site.
+        meta_parts.append('<span class="card-source">Goodreads&nbsp;↗</span>')
         author_html = (
             f'<span class="card-author">{e(book["author"])}</span>' if book["author"] else ""
         )
+        # Notes sit outside the link: they are Markdown and may contain links
+        # of their own, which cannot nest inside an anchor.
+        notes_html = (
+            f'<div class="want-note">{book["body_html"]}</div>' if book["body_html"] else ""
+        )
         cards.append(
             f'<li class="card want-card">'
+            f'<a class="card-link" href="{e(goodreads_url(book))}" '
+            f'target="_blank" rel="noopener">'
             f'<img class="card-cover" src="{cover_src}"{onerror} alt="" '
             f'width="300" height="450" loading="lazy">'
-            f'<div class="card-text">'
+            f'<span class="card-text">'
             f'<span class="card-title">{title_html(book["title"])}</span>'
-            f'{author_html}{meta_html}{notes_html}'
-            f"</div></li>"
+            f'{author_html}'
+            f'<span class="card-meta">{"".join(meta_parts)}</span>'
+            f'</span></a>{notes_html}</li>'
         )
 
     empty_html = "" if books else '<p class="empty">Nothing on the list yet.</p>'
