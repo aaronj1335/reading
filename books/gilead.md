@@ -53,6 +53,8 @@ Second reading, I'm really struck by how it explores the distance between 2 gene
 
 ---
 
+> Cataract that this world is, it is remarkable to consider what does abide in it
+
 ---
 
 > Any human face is a claim on you, because you can't help but understand the singularity of it, the courage and loneliness of it. But this is truest of the face of an infant. I consider that to be one kind of vision, as mystical as any.
