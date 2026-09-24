@@ -68,3 +68,9 @@ Second reading, I'm really struck by how it explores the distance between 2 gene
 ---
 
 > I think the attempt to defend belief can unsettle it, in fact, because there is always an inadequacy in argument about ultimate things.
+
+---
+
+> There are a thousand thousand reasons to live this life, every one of them sufficient.
+
+I love the contrast of this to [The Anna Karenina principle](https://en.wikipedia.org/wiki/Anna_Karenina_principle).
