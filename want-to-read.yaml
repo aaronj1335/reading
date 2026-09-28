@@ -17,6 +17,11 @@
 # (finished, started, stars) are what a book picks up once it moves to books/.
 # Newest addition first, by convention.
 
+- title: 'The Laws of Medicine: Field Notes from an Uncertain Science'
+  author: Siddhartha Mukherjee
+  isbn: 9781476784847
+  pages: 96
+  category: nonfiction
 - title: 'The Boys in the Boat: Nine Americans and Their Epic Quest for Gold at the 1936 Berlin Olympics'
   author: Daniel James Brown
   isbn: 9780670025817
