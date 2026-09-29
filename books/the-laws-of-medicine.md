@@ -8,3 +8,5 @@ started: 2026-09-20
 stars: 3
 category: nonfiction
 ---
+
+Awesome short little book about doing anything remotely scientific in the face of uncertainty and imperfect information.
