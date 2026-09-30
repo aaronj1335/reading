@@ -61,12 +61,6 @@ Second reading, I'm really struck by how it explores the distance between 2 gene
 
 ---
 
-> I'll pray that you grow up a brave man in a brave country. I will pray you find a way to be useful.
->
-> I'll pray, and then I'll sleep.
-
----
-
 > I think the attempt to defend belief can unsettle it, in fact, because there is always an inadequacy in argument about ultimate things.
 
 ---
@@ -74,3 +68,9 @@ Second reading, I'm really struck by how it explores the distance between 2 gene
 > There are a thousand thousand reasons to live this life, every one of them sufficient.
 
 I love the contrast of this to [The Anna Karenina principle](https://en.wikipedia.org/wiki/Anna_Karenina_principle).
+
+---
+
+> I'll pray that you grow up a brave man in a brave country. I will pray you find a way to be useful.
+>
+> I'll pray, and then I'll sleep.
