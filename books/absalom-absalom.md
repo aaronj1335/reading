@@ -16,4 +16,4 @@ The things that struck for me from this book:
 * It showed how history becomes storytelling, and storytelling becomes history and the cycle repeats itself. Very compactly in the matter of even a single generation. So biased, unreliable narrators end up being the authors of history that as facts, even to kids. 
 * The dynamic of cycles of abuse is a big thing. Hurt people hurt people, and on this book it's most in your face from one generation to the next.
 
-[2 Samuel 1:18](https://en.everywherebible.org/2%20Samuel+18:33)
+[2 Samuel 18:33](https://en.everywherebible.org/2%20Samuel+18:33)
