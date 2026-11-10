@@ -8,7 +8,10 @@
 </header>
 <main>
   <p class="add-cta"><a class="add-link" href="{add_url}">＋ Add a book</a></p>
-  <ul class="book-list want-list">{items_html}</ul>
+  {controls}
+  <ul id="list" class="book-list want-list">{items_html}</ul>
   {empty_html}
+  <p id="empty" class="empty" hidden>No books match.</p>
   <p class="edit-page"><a class="edit-link" href="{add_url}">Edit this list on GitHub</a></p>
 </main>
+<script src="want-to-read.js"></script>

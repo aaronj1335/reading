@@ -190,6 +190,8 @@ main, .site-header { max-width: var(--maxw); margin: 0 auto; padding: 0 1rem; }
    page of its own yet. */
 .want-list { margin-top: 0.9rem; }
 .want-card { display: flex; gap: 0.85rem; align-items: flex-start; }
+/* display:flex above would otherwise beat the [hidden] the filters set. */
+.want-card[hidden] { display: none; }
 .want-note { margin-top: 0.55rem; font-size: 0.9rem; color: var(--muted); }
 .want-note p { margin: 0; }
 .want-note p + p { margin-top: 0.5rem; }
