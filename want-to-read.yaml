@@ -17,6 +17,11 @@
 # (finished, started, stars) are what a book picks up once it moves to books/.
 # Newest addition first, by convention.
 
+- title: 'Where Wizards Stay Up Late: The Origins of the Internet'
+  author: Katie Hafner and Matthew Lyon
+  isbn: 9780684832678
+  pages: 304
+  category: nonfiction
 - title: Death Comes for the Archbishop
   author: Willa Cather
   isbn: 9780679728894
