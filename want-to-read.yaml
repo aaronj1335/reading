@@ -17,6 +17,11 @@
 # (finished, started, stars) are what a book picks up once it moves to books/.
 # Newest addition first, by convention.
 
+- title: 'Material World: The Six Raw Materials That Shape Modern Civilization'
+  author: Ed Conway
+  isbn: 9780593534342
+  pages: 512
+  category: nonfiction
 - title: 'Where Wizards Stay Up Late: The Origins of the Internet'
   author: Katie Hafner and Matthew Lyon
   isbn: 9780684832678
