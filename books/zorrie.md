@@ -9,6 +9,6 @@ stars: 3
 category: fiction
 ---
 
-I loved this book's portrait of grief without bitterness.
+I appreciated this book's portrait of grief without bitterness.
 
 And if course I always enjoy books where the place is almost a character unto itself, especially when it's Indiana. Loved all the mentions of towns through the state. 
