@@ -1,5 +1,5 @@
 <div class="controls" id="controls">
-  <input type="search" id="search" placeholder="Search title, author, tag…" autocomplete="off" aria-label="Search">
+  <input type="search" id="search" placeholder="{search_placeholder}" autocomplete="off" aria-label="Search">
   <div class="filters">
     <select id="category" aria-label="Category">
       <option value="">All</option>
@@ -15,11 +15,7 @@
       {tag_options}
     </select>
     <select id="sort" aria-label="Sort by">
-      <option value="finished">Recently finished</option>
-      <option value="started">Recently started</option>
-      <option value="title">Title</option>
-      <option value="author">Author</option>
-      <option value="stars">Rating</option>
+      {sort_options}
     </select>
   </div>
 </div>

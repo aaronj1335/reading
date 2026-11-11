@@ -12,6 +12,7 @@ parses them and renders:
   _site/reading.epub      EPUB 3 export for publish-on-demand services
   _site/index.js          copied from static/
   _site/stats.js          copied from static/
+  _site/want-to-read.js   copied from static/
   _site/style.css         copied from static/
   _site/.nojekyll         so GitHub Pages serves files verbatim
 
@@ -251,15 +252,45 @@ def stars_display(n):
     return "★" * n + "☆" * (5 - n) if n else ""
 
 
+# Sort choices for the controls bar, as (value, label); the first is the
+# default. The want-to-read queue has no dates or ratings, so it gets its own
+# set — file order stands in for "recently added".
+INDEX_SORTS = (
+    ("finished", "Recently finished"),
+    ("started", "Recently started"),
+    ("title", "Title"),
+    ("author", "Author"),
+    ("stars", "Rating"),
+)
+WANT_TO_READ_SORTS = (
+    ("added", "Recently added"),
+    ("title", "Title"),
+    ("author", "Author"),
+    ("shortest", "Shortest first"),
+    ("longest", "Longest first"),
+)
+
+
+def render_controls(books, sorts, search_placeholder):
+    """The search / category / tag / sort bar shared by the index and the
+    want-to-read page. Tag options are the distinct tags across `books`."""
+    tags = sorted({t for b in books for t in b["tags"]})
+    tag_options = "".join(f'<option value="{e(t)}">{e(t)}</option>' for t in tags)
+    sort_options = "".join(
+        f'<option value="{e(value)}">{e(label)}</option>' for value, label in sorts
+    )
+    return template("controls.template.html").format(
+        tag_options=tag_options,
+        sort_options=sort_options,
+        search_placeholder=e(search_placeholder),
+    )
+
+
 def render_index(books):
     fields = ("slug", "title", "author", "finished", "started", "sort_date",
               "category", "tags", "stars", "cover")
     data = json.dumps([{k: b[k] for k in fields} for b in books], ensure_ascii=False)
-    # All distinct tags, for the tag filter.
-    tags = sorted({t for b in books for t in b["tags"]})
-    tag_options = "".join(f'<option value="{e(t)}">{e(t)}</option>' for t in tags)
-
-    controls = template("controls.template.html").format(tag_options=tag_options)
+    controls = render_controls(books, INDEX_SORTS, "Search title, author, tag…")
     body = template("index.template.html").format(controls=controls, data=data)
     return page("Reading", "", body, depth=0)
 
@@ -357,14 +388,15 @@ def render_stats(books):
 def render_want_to_read(books):
     """Render the standalone "want to read" queue page.
 
-    The list is short and static, so unlike the index it ships as plain
-    server-rendered HTML: no data blob, no JavaScript, no filters. Cards match
-    the index's, minus the parts a book only has once it has been read. Where
-    an index card links to the book's own page, a queued one carries links out
-    to a summary of it — see summary_links().
+    Cards are server-rendered, so the page reads fine without JavaScript. Each
+    card carries data-* attributes that want-to-read.js searches, filters and
+    sorts on, giving the queue the same controls as the index. Cards match the
+    index's, minus the parts a book only has once it has been read. Where an
+    index card links to the book's own page, a queued one carries links out to
+    a summary of it — see summary_links().
     """
     cards = []
-    for book in books:
+    for order, book in enumerate(books):
         cover_src, onerror = cover_attrs(book)
         meta_parts = []
         if book["category"]:
@@ -389,8 +421,23 @@ def render_want_to_read(books):
         notes_html = (
             f'<div class="want-note">{book["body_html"]}</div>' if book["body_html"] else ""
         )
+        # Search covers what the index's does (title, author, tags) plus the
+        # entry's notes, which is often where "who recommended this" lives.
+        notes_text = html.unescape(re.sub(r"<[^>]+>", " ", book["body_html"]))
+        search_text = " ".join(
+            [book["title"], book["author"], *book["tags"], notes_text]
+        ).lower()
+        data_attrs = (
+            f' data-order="{order}"'
+            f' data-title="{e(book["title"])}"'
+            f' data-author="{e(book["author"])}"'
+            f' data-category="{e(book["category"])}"'
+            f' data-tags="{e(json.dumps(book["tags"], ensure_ascii=False))}"'
+            f' data-pages="{book["pages"] or ""}"'
+            f' data-search="{e(" ".join(search_text.split()))}"'
+        )
         cards.append(
-            f'<li class="card want-card">'
+            f'<li class="card want-card"{data_attrs}>'
             f'<img class="card-cover" src="{cover_src}"{onerror} alt="" '
             f'width="300" height="450" loading="lazy">'
             f'<div class="card-text">'
@@ -403,7 +450,13 @@ def render_want_to_read(books):
     empty_html = "" if books else '<p class="empty">Nothing on the list yet.</p>'
     count_text = f"{len(books)} book{'' if len(books) == 1 else 's'} queued up"
 
+    controls = (
+        render_controls(books, WANT_TO_READ_SORTS, "Search title, author, tag, notes…")
+        if books else ""
+    )
+
     body = template("want-to-read.template.html").format(
+        controls=controls,
         count_text=e(count_text),
         add_url=e(WANT_TO_READ_EDIT_URL),
         items_html="".join(cards),
@@ -715,7 +768,7 @@ def main():
     (SITE_DIR / "feed.rss").write_text(render_rss(books), encoding="utf-8")
     write_epub(books, SITE_DIR / "reading.epub")
 
-    for asset in ("index.js", "stats.js", "style.css"):
+    for asset in ("index.js", "stats.js", "want-to-read.js", "style.css"):
         shutil.copy(STATIC_DIR / asset, SITE_DIR / asset)
     (SITE_DIR / ".nojekyll").write_text("", encoding="utf-8")
 
