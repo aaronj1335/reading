@@ -192,15 +192,35 @@ def e(s):
     return html.escape(s, quote=True)
 
 
+# Files copied verbatim from static/ into _site/.
+STATIC_ASSETS = ("index.js", "stats.js", "want-to-read.js", "style.css")
+
+
+@lru_cache(maxsize=None)
+def asset_version(name):
+    """Short content hash of a static asset, appended to its URL so a deploy
+    that changes it can't be paired with a stale cached copy (e.g. new HTML and
+    JS with yesterday's style.css)."""
+    return hashlib.sha256((STATIC_DIR / name).read_bytes()).hexdigest()[:10]
+
+
+_ASSET_REF_RE = re.compile(
+    r'((?:src|href)="(?:\.\./)*)(' + "|".join(map(re.escape, STATIC_ASSETS)) + r')"'
+)
+
+
 def page(title, head_extra, body, depth):
     """Wrap body in the shared HTML shell. `depth` = path depth below site root."""
     prefix = "../" * depth
-    return template("page.template.html").format(
+    html_out = template("page.template.html").format(
         title=e(title),
         normalize_cdn=NORMALIZE_CDN,
         prefix=prefix,
         head_extra=head_extra,
         body=body,
+    )
+    return _ASSET_REF_RE.sub(
+        lambda m: f'{m.group(1)}{m.group(2)}?v={asset_version(m.group(2))}"', html_out
     )
 
 
@@ -768,7 +788,7 @@ def main():
     (SITE_DIR / "feed.rss").write_text(render_rss(books), encoding="utf-8")
     write_epub(books, SITE_DIR / "reading.epub")
 
-    for asset in ("index.js", "stats.js", "want-to-read.js", "style.css"):
+    for asset in STATIC_ASSETS:
         shutil.copy(STATIC_DIR / asset, SITE_DIR / asset)
     (SITE_DIR / ".nojekyll").write_text("", encoding="utf-8")
 

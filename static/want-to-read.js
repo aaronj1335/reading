@@ -56,7 +56,9 @@ function updateUrl() {
 }
 
 function render() {
-  const q = searchEl.value.trim().toLowerCase();
+  // Every word of the query must appear somewhere, in any order, so
+  // "caro moses" finds The Power Broker.
+  const words = searchEl.value.toLowerCase().split(/\s+/).filter(Boolean);
   const cat = categoryEl.value;
   const tag = tagEl.value;
   const excludeTag = excludeTagEl.value;
@@ -70,8 +72,12 @@ function render() {
       (!cat || b.category === cat) &&
       (!tag || b.tags.includes(tag)) &&
       (!excludeTag || !b.tags.includes(excludeTag)) &&
-      (!q || b.search.includes(q));
+      words.every((w) => b.search.includes(w));
     b.el.hidden = !match;
+    // Also hide inline: the cards are display:flex, which beats [hidden]
+    // unless the stylesheet says otherwise, and a stale cached style.css
+    // wouldn't — leaving every card on screen whatever the search.
+    b.el.style.display = match ? "" : "none";
     if (match) shown++;
     listEl.appendChild(b.el); // re-append in sorted order
   }
